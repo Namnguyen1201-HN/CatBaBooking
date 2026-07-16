@@ -1,0 +1,184 @@
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homestay tại Cát Bà - Cát Bà Booking</title>
+    <link rel="stylesheet" href="~/css/HomePage/home-style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .homestay-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:20px;}
+        .homestay-card{background-color:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.08);overflow:hidden;transition:transform .3s ease,box-shadow .3s ease;display:flex;flex-direction:column;position:relative;}
+        .homestay-card:hover{transform:translateY(-5px);box-shadow:0 8px 20px rgba(0,0,0,0.12);}
+        .homestay-card .card-image{position:relative;height:200px;}
+        .homestay-card .card-image img{width:100%;height:100%;object-fit:cover;}
+        .homestay-card .card-content{padding:16px;display:flex;flex-direction:column;flex-grow:1;}
+        .homestay-card .rating .stars{color:#ffc107;}
+        .homestay-card .reviews{font-size:.85rem;color:#6c757d;margin-left:4px;}
+        .homestay-card .price-range{font-weight:700;color:#007bff;font-size:1.1rem;}
+        .homestay-card h3{font-size:1.2rem;margin:8px 0;color:#343a40;}
+        .homestay-card .location{font-size:.9rem;color:#6c757d;margin-top:auto;}
+        .detail-btn{text-decoration:none;position:absolute;bottom:16px;right:16px;background-color:#28a745;color:#ffffff;padding:6px 12px;border-radius:4px;}
+        .detail-btn:hover{background-color:#218838;color:#fff;}
+        .pagination{display:flex;justify-content:center;align-items:center;gap:8px;margin:30px 0;flex-wrap:wrap;}
+        .page-btn{min-width:40px;height:40px;padding:0 12px;border:1px solid #ddd;border-radius:6px;background:#fff;color:#6c757d;font-size:14px;font-weight:500;text-decoration:none;display:flex;align-items:center;justify-content:center;transition:all .2s ease;cursor:pointer;}
+        .page-btn.active{background-color:#28a745;color:white;border-color:#28a745;font-weight:600;}
+        .page-btn:disabled{color:#aaa;background-color:#f8f9fa;cursor:not-allowed;border-color:#eee;}
+        @@media(max-width:992px){.homestay-grid{grid-template-columns:repeat(2,1fr);}}
+        @@media(max-width:768px){.homestay-grid{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+    @await Html.PartialAsync("Sidebar")
+
+    <section class="hero">
+        <div class="hero-overlay"></div><div class="hero-bg"></div>
+        <div class="container"><div class="hero-content">
+            <div class="hero-text"><h1>Homestay tại Cát Bà</h1><p>Tìm và đặt homestay phù hợp với nhu cầu của bạn</p></div>
+            <div class="search-forms"><div class="search-form active">
+                <div class="form-tabs">
+                    <button class="form-tab active"><i class="fas fa-home"></i><span>Homestay</span></button>
+                    <button class="form-tab"><span>Villa</span></button>
+                    <button class="form-tab"><span>Phòng đôi</span></button>
+                </div>
+                <form action="/homestay-page" method="GET">
+                    <div class="form-grid" style="display:flex;flex-wrap:wrap;gap:15px;align-items:end;">
+                        <div class="form-field" style="flex:0 0 200px;"><label>Khu vực</label><div class="input-wrapper"><i class="fas fa-map-marker-alt"></i><select name="areaId" class="form-select"><option value="0">Tất cả khu vực</option><option value="1">Cát Cò 1</option><option value="2">Cát Cò 2</option></select></div></div>
+                        <div class="form-field" style="flex:0 0 220px;"><label>Ngày nhận</label><div class="input-wrapper"><i class="fas fa-calendar"></i><input type="date" name="checkIn" class="form-input"></div></div>
+                        <div class="form-field" style="flex:0 0 220px;"><label>Ngày trả</label><div class="input-wrapper"><i class="fas fa-calendar"></i><input type="date" name="checkOut" class="form-input"></div></div>
+                        <div class="form-field-group" style="flex:0 0 220px;display:flex;gap:10px;">
+                            <div class="form-field" style="flex:1;"><label>Số người</label><div class="input-wrapper"><i class="fas fa-users"></i><input type="number" name="guests" class="form-input" min="1" value="1"></div></div>
+                            <div class="form-field" style="flex:1;"><label>Số phòng</label><div class="input-wrapper"><i class="fas fa-door-open"></i><input type="number" name="numRooms" class="form-input" min="1" value="1"></div></div>
+                        </div>
+                        <div class="form-field" style="flex:0 0 200px;"><button type="submit" class="search-btn"><i class="fas fa-search"></i> Tìm homestay</button></div>
+                    </div>
+                </form>
+            </div></div>
+        </div></div>
+    </section>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="content-layout">
+                <div class="sidebar">
+                    <div class="filter-section">
+                        <div class="filter-header"><i class="fas fa-sliders-h"></i><h3>Bộ lọc</h3></div>
+                        <div class="filter-group">
+                            <h4>Khoảng giá (VND)</h4>
+                            <div class="filter-options">
+                                <label class="filter-option"><input type="radio" name="priceRange" value="" checked><span>Tất cả</span></label>
+                                <label class="filter-option"><input type="radio" name="priceRange" value="0-200000"><span>Dưới 200.000</span></label>
+                                <label class="filter-option"><input type="radio" name="priceRange" value="200000-500000"><span>200.000 - 500.000</span></label>
+                                <label class="filter-option"><input type="radio" name="priceRange" value="500000-1000000"><span>500.000 - 1.000.000</span></label>
+                                <label class="filter-option"><input type="radio" name="priceRange" value="1000000-0"><span>Trên 1.000.000</span></label>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <h4>Đánh giá</h4>
+                            <div class="filter-options">
+                                <label class="filter-option"><input type="checkbox" name="minRating" value="5"><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span>5 sao</span></div></label>
+                                <label class="filter-option"><input type="checkbox" name="minRating" value="4"><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span>4+ sao</span></div></label>
+                                <label class="filter-option"><input type="checkbox" name="minRating" value="3"><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div><span>3+ sao</span></div></label>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <h4>Tiện ích</h4>
+                            <div class="filter-options">
+                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="1"><span>WiFi miễn phí</span></label>
+                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="2"><span>Bữa sáng</span></label>
+                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="3"><span>Bãi đỗ xe</span></label>
+                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="4"><span>Hồ bơi</span></label>
+                            </div>
+                        </div>
+                        <button class="apply-filter-btn">Áp dụng bộ lọc</button>
+                    </div>
+                </div>
+
+                <div class="results-section">
+                    <div class="results-header">
+                        <div class="results-info"><h2>Homestay tại Cát Bà</h2><p>Tìm thấy <span>6</span> homestay</p></div>
+                        <div class="results-controls">
+                            <div class="sort-control"><label>Sắp xếp:</label><select class="sort-select"><option>Phù hợp nhất</option><option>Giá thấp đến cao</option><option>Giá cao đến thấp</option><option>Đánh giá cao nhất</option></select></div>
+                        </div>
+                    </div>
+                    <div class="popular-filters">
+                        <span class="filter-tag">View biển</span><span class="filter-tag">WiFi miễn phí</span><span class="filter-tag">Bữa sáng</span><span class="filter-tag">Chỗ đậu xe</span>
+                    </div>
+
+                    <div class="homestay-grid">
+                        <div class="homestay-card">
+                            <div class="card-image"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=250&fit=crop" alt="Ocean View"><div class="badge type"><i class="fas fa-home"></i> Homestay</div></div>
+                            <div class="card-content">
+                                <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div><span class="reviews">(128)</span></div><span class="price-range">850,000</span></div>
+                                <h3>Homestay Ocean View Cát Bà</h3>
+                                <div class="location"><i class="fas fa-map-marker-alt"></i> Cát Cò 1</div>
+                            </div>
+                            <a class="detail-btn" href="/homestay-detail">Chi tiết</a>
+                        </div>
+                        <div class="homestay-card">
+                            <div class="card-image"><img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=250&fit=crop" alt="Villa"><div class="badge type"><i class="fas fa-home"></i> Homestay</div></div>
+                            <div class="card-content">
+                                <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span class="reviews">(94)</span></div><span class="price-range">1,200,000</span></div>
+                                <h3>Villa Hải Đăng Cát Bà</h3>
+                                <div class="location"><i class="fas fa-map-marker-alt"></i> Cát Cò 2</div>
+                            </div>
+                            <a class="detail-btn" href="/homestay-detail">Chi tiết</a>
+                        </div>
+                        <div class="homestay-card">
+                            <div class="card-image"><img src="https://images.unsplash.com/photo-1549294413-26f195200c16?w=400&h=250&fit=crop" alt="Biển Xanh"><div class="badge type"><i class="fas fa-home"></i> Homestay</div></div>
+                            <div class="card-content">
+                                <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span class="reviews">(67)</span></div><span class="price-range">650,000</span></div>
+                                <h3>Homestay Biển Xanh</h3>
+                                <div class="location"><i class="fas fa-map-marker-alt"></i> Bến Bèo</div>
+                            </div>
+                            <a class="detail-btn" href="/homestay-detail">Chi tiết</a>
+                        </div>
+                        <div class="homestay-card">
+                            <div class="card-image"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&h=250&fit=crop" alt="Sơn Ca"><div class="badge type"><i class="fas fa-home"></i> Homestay</div></div>
+                            <div class="card-content">
+                                <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span class="reviews">(43)</span></div><span class="price-range">750,000</span></div>
+                                <h3>Homestay Sơn Ca</h3>
+                                <div class="location"><i class="fas fa-map-marker-alt"></i> Cát Cò 3</div>
+                            </div>
+                            <a class="detail-btn" href="/homestay-detail">Chi tiết</a>
+                        </div>
+                        <div class="homestay-card">
+                            <div class="card-image"><img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=250&fit=crop" alt="Đảo Ngọc"><div class="badge type"><i class="fas fa-home"></i> Homestay</div></div>
+                            <div class="card-content">
+                                <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i></div><span class="reviews">(56)</span></div><span class="price-range">490,000</span></div>
+                                <h3>Homestay Đảo Ngọc</h3>
+                                <div class="location"><i class="fas fa-map-marker-alt"></i> Bến Bèo</div>
+                            </div>
+                            <a class="detail-btn" href="/homestay-detail">Chi tiết</a>
+                        </div>
+                        <div class="homestay-card">
+                            <div class="card-image"><img src="https://images.unsplash.com/photo-1501183638710-841dd1904471?w=400&h=250&fit=crop" alt="Lưng Chừng Trời"><div class="badge type"><i class="fas fa-home"></i> Homestay</div></div>
+                            <div class="card-content">
+                                <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span class="reviews">(112)</span></div><span class="price-range">1,500,000</span></div>
+                                <h3>Homestay Lưng Chừng Trời</h3>
+                                <div class="location"><i class="fas fa-map-marker-alt"></i> Pháo Đài</div>
+                            </div>
+                            <a class="detail-btn" href="/homestay-detail">Chi tiết</a>
+                        </div>
+                    </div>
+
+                    <div class="pagination">
+                        <button class="page-btn" disabled>Trước</button>
+                        <a href="#" class="page-btn active">1</a>
+                        <a href="#" class="page-btn">2</a>
+                        <a href="#" class="page-btn">Sau</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @await Html.PartialAsync("Footer")
+    <style>.user-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border-radius:9999px;text-decoration:none;font-weight:500;}.login-btn{background:rgba(255,255,255,.1);color:white;}</style>
+</body>
+</html>

@@ -1,0 +1,157 @@
+
+
+@{
+Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác nhận Thanh toán - Nhà hàng Hải Sản Cát Bà</title>
+    <link rel="stylesheet" href="~/css/HomePage/home-style.css">
+    <link rel="stylesheet" href="~/css/HomePage/restaurantdetail-style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .checkout-page{padding:2rem 0;background-color:#f9fafb;min-height:80vh;}
+        .checkout-layout{display:grid;grid-template-columns:2fr 1fr;gap:2rem;max-width:1200px;margin:0 auto;padding:0 1rem;}
+        .form-card{background:white;border:1px solid #e5e7eb;border-radius:.5rem;padding:2rem;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);}
+        .form-card h2{font-size:1.5rem;font-weight:600;color:#111827;margin-bottom:1.5rem;border-bottom:1px solid #e5e7eb;padding-bottom:1rem;}
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+        .form-group{margin-bottom:1.25rem;}
+        .form-group.full-width{grid-column:1/-1;}
+        .form-label{display:block;font-size:.875rem;font-weight:500;color:#374151;margin-bottom:.5rem;}
+        .form-label .required{color:#dc2626;}
+        .form-input{width:100%;padding:.75rem;border:1px solid #d1d5db;border-radius:.375rem;font-size:1rem;box-sizing:border-box;}
+        .form-input:focus{outline:none;border-color:#0d6efd;box-shadow:0 0 0 3px rgba(13,110,253,.1);}
+        .btn-primary{background:#059669;color:#fff;border:none;padding:.75rem 1.5rem;border-radius:.375rem;font-size:1rem;cursor:pointer;width:100%;font-weight:600;}
+        .btn-primary:hover{background:#047857;}
+        .summary-card{background:white;border:1px solid #e5e7eb;border-radius:.5rem;padding:2rem;box-shadow:0 4px 6px -1px rgba(0,0,0,.05);align-self:start;position:sticky;top:2rem;}
+        .summary-card h3{font-size:1.25rem;font-weight:600;color:#111827;margin-bottom:1rem;}
+        .summary-item{display:flex;align-items:flex-start;padding:.75rem 0;border-bottom:1px solid #e5e7eb;gap:.75rem;}
+        .summary-item:last-child{border-bottom:none;}
+        .summary-item-image{width:60px;height:60px;object-fit:cover;border-radius:.375rem;flex-shrink:0;}
+        .summary-item-content{flex:1;}
+        .summary-item-name{font-weight:500;margin-bottom:.25rem;color:#111827;}
+        .summary-item-meta{font-size:.875rem;color:#6b7280;}
+        .summary-item-price{font-weight:600;color:#059669;text-align:right;white-space:nowrap;}
+        .total-row{border-top:2px solid #e5e7eb;padding-top:1rem;margin-top:1rem;font-size:1.25rem;font-weight:600;display:flex;justify-content:space-between;color:#111827;}
+        .total-row .total-amount{color:#059669;}
+        .restaurant-info{background:#f3f4f6;padding:1rem;border-radius:.5rem;margin-bottom:1.5rem;}
+        .restaurant-info h4{font-size:1.125rem;font-weight:600;color:#111827;margin-bottom:.5rem;}
+        .restaurant-info p{font-size:.875rem;color:#6b7280;margin:.25rem 0;}
+        @@media(max-width:768px){.checkout-layout{grid-template-columns:1fr;}.summary-card{position:relative;top:0;}}
+        .header{background:linear-gradient(135deg,#059669,#065f46);color:white;padding:1rem 0;}
+        .nav-content{display:flex;justify-content:space-between;align-items:center;}
+        .logo{font-size:1.5rem;font-weight:bold;display:flex;align-items:center;text-decoration:none;}
+        .logo-main{color:white;}.logo-sub{color:#a7f3d0;margin-left:.25rem;}
+    </style>
+</head>
+<body>
+@await Html.PartialAsync("Sidebar")
+
+<div class="checkout-page">
+    <div class="checkout-layout">
+        <div class="form-card">
+            <h2>Thông tin đặt bàn</h2>
+
+            <div class="restaurant-info">
+                <h4><i class="fas fa-utensils"></i> Nhà hàng Hải Sản Cát Bà</h4>
+                <p><i class="fas fa-map-marker-alt"></i> Cát Cò 1, Hải Phòng</p>
+                <p><i class="fas fa-clock"></i> 08:00 - 22:00</p>
+            </div>
+
+            <form id="checkoutForm" action="#" method="post">
+                <input type="hidden" name="restaurantId" value="1">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Tên khách hàng <span class="required">*</span></label>
+                        <input type="text" name="bookerName" class="form-input" placeholder="Họ và tên đầy đủ" value="Nguyễn Văn A" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Số điện thoại <span class="required">*</span></label>
+                        <input type="tel" name="bookerPhone" class="form-input" placeholder="0123456789" value="0912345678" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">Email <span class="required">*</span></label>
+                        <input type="email" name="bookerEmail" class="form-input" placeholder="email@example.com" value="nguyenvana@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ngày đặt bàn <span class="required">*</span></label>
+                        <input type="date" name="reservationDate" id="reservationDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Giờ đặt bàn <span class="required">*</span></label>
+                        <input type="time" name="reservationTime" id="reservationTime" class="form-input" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">Số lượng khách <span class="required">*</span></label>
+                        <input type="number" name="numGuests" id="numGuests" class="form-input" min="1" max="20" value="2" required>
+                        <small style="color:#6b7280;font-size:.875rem;">Số khách từ 1-20 người</small>
+                    </div>
+                </div>
+                <button type="submit" id="submitBtn" class="btn-primary">
+                    <i class="fas fa-check-circle"></i> Xác nhận đặt bàn
+                </button>
+            </form>
+        </div>
+
+        <div class="summary-card">
+            <h3><i class="fas fa-receipt"></i> Chi tiết đơn hàng</h3>
+            <div class="summary-item">
+                <img src="https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=60&h=60&fit=crop" alt="Tôm Hùm" class="summary-item-image">
+                <div class="summary-item-content">
+                    <div class="summary-item-name">Tôm Hùm Nướng Muối Ớt</div>
+                    <div class="summary-item-meta">SL: 1 × 450,000 ₫</div>
+                </div>
+                <div class="summary-item-price">450,000 ₫</div>
+            </div>
+            <div class="summary-item">
+                <img src="https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=60&h=60&fit=crop" alt="Cua" class="summary-item-image">
+                <div class="summary-item-content">
+                    <div class="summary-item-name">Cua Biển Rang Muối</div>
+                    <div class="summary-item-meta">SL: 2 × 350,000 ₫</div>
+                </div>
+                <div class="summary-item-price">700,000 ₫</div>
+            </div>
+            <div class="summary-item">
+                <img src="https://images.unsplash.com/photo-1604909052743-94e838986d24?w=60&h=60&fit=crop" alt="Mực" class="summary-item-image">
+                <div class="summary-item-content">
+                    <div class="summary-item-name">Mực Nướng Mỡ Hành</div>
+                    <div class="summary-item-meta">SL: 1 × 180,000 ₫</div>
+                </div>
+                <div class="summary-item-price">180,000 ₫</div>
+            </div>
+            <div class="total-row">
+                <span>Tổng cộng:</span>
+                <span class="total-amount">1,330,000 ₫</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("Footer")
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateInput = document.getElementById('reservationDate');
+        const timeInput = document.getElementById('reservationTime');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+        if (!dateInput.value) dateInput.value = today;
+        if (!timeInput.value) {
+            const now = new Date(); now.setHours(now.getHours() + 2);
+            timeInput.value = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+        }
+        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+            const selected = new Date(dateInput.value);
+            const todayD = new Date(); todayD.setHours(0,0,0,0);
+            if (selected < todayD) { e.preventDefault(); alert('Ngày đặt bàn không thể là ngày trong quá khứ!'); return false; }
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+        });
+    });
+</script>
+</body>
+</html>

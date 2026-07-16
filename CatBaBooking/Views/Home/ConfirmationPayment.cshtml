@@ -1,0 +1,108 @@
+
+
+@{
+Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác Nhận Thanh Toán - Nhà hàng Hải Sản Cát Bà</title>
+    <link rel="stylesheet" href="~/css/HomePage/home-style.css">
+    <link rel="stylesheet" href="~/css/HomePage/restaurantdetail-style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .confirmation-container{display:flex;min-height:80vh;background:linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%);}
+        .main-content{flex:1;padding:2rem;max-width:800px;margin:0 auto;background:white;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.1);}
+        .confirmation-header{text-align:center;margin-bottom:2rem;color:#1e293b;}
+        .confirmation-header h2{font-size:2rem;margin-bottom:.5rem;background:linear-gradient(135deg,#059669,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+        .info-card{background:#f8fafc;padding:1.5rem;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+        .info-card p{margin:.5rem 0;font-size:1rem;color:#475569;}
+        .info-card strong{color:#1e293b;}
+        .qr-section{text-align:center;margin:2rem auto;padding:2rem;background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08);max-width:400px;}
+        .qr-image{max-width:280px;width:100%;border:2px solid #e2e8f0;border-radius:12px;margin:0 auto 1rem;display:block;box-shadow:0 4px 12px rgba(0,0,0,.1);}
+        .status-alert{padding:1.5rem;border-radius:12px;margin:1rem 0;text-align:center;font-weight:600;display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:1.1rem;}
+        .status-pending{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;border:1px solid #fbbf24;}
+        .status-paid{background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:#065f46;border:1px solid #34d399;}
+        .countdown{font-size:2.5rem;color:#dc3545;font-weight:bold;text-align:center;margin:1.5rem 0;background:linear-gradient(135deg,#fee2e2,#fecaca);padding:1rem;border-radius:12px;border:2px solid #fca5a5;font-family:'Courier New',monospace;letter-spacing:2px;}
+        .header{background:linear-gradient(135deg,#059669,#065f46);color:white;padding:1rem 0;}
+        .nav-content{display:flex;justify-content:space-between;align-items:center;}
+        .logo{font-size:1.5rem;font-weight:bold;display:flex;align-items:center;text-decoration:none;}
+        .logo-main{color:white;}.logo-sub{color:#a7f3d0;margin-left:.25rem;}
+    </style>
+</head>
+<body>
+@await Html.PartialAsync("Sidebar")
+
+<div class="confirmation-container">
+    <main class="main-content">
+        <div class="confirmation-header">
+            <h2><i class="fas fa-receipt"></i> Xác Nhận Thanh Toán</h2>
+            <p>Hoàn tất thanh toán để xác nhận đặt bàn tại Nhà hàng Hải Sản Cát Bà</p>
+        </div>
+
+        <div class="info-card">
+            <p><i class="fas fa-hashtag"></i> <strong>Mã đặt bàn:</strong> CB2025006</p>
+            <p><i class="fas fa-store"></i> <strong>Nhà hàng:</strong> Nhà hàng Hải Sản Cát Bà</p>
+            <p><i class="fas fa-calendar-day"></i> <strong>Ngày đặt:</strong> 20/06/2025 lúc 19:00</p>
+            <p><i class="fas fa-users"></i> <strong>Số khách:</strong> 4</p>
+            <p><i class="fas fa-money-bill-wave"></i> <strong>Số tiền:</strong> 1,330,000 ₫</p>
+        </div>
+
+        <div id="statusAlert" class="status-alert status-pending">
+            <i class="fas fa-clock"></i> Đang chờ thanh toán... Vui lòng quét QR trong 5 phút.
+        </div>
+
+        <div class="qr-section" id="qrSection">
+            <h3 style="margin-bottom:1rem;color:#1e293b;"><i class="fas fa-qrcode"></i> Quét mã QR để thanh toán</h3>
+            <!-- Placeholder QR (trong thực tế sẽ là QR động từ SePay) -->
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=TKPDVN%20CB2025006%201330000" alt="QR Thanh Toán" class="qr-image">
+            <p style="font-size:.9rem;color:#6b7280;margin-top:1rem;"><small><strong>Nội dung chuyển khoản:</strong> <b>TKPDVN CB2025006</b></small></p>
+        </div>
+
+        <div class="countdown" id="countdown">05:00</div>
+    </main>
+</div>
+
+@await Html.PartialAsync("Footer")
+
+<script>
+    let totalSeconds = 300;
+    let isPaid = false;
+    const countdownEl = document.getElementById('countdown');
+    const statusAlert = document.getElementById('statusAlert');
+
+    const interval = setInterval(() => {
+        if (isPaid) { clearInterval(interval); return; }
+        totalSeconds--;
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+        countdownEl.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+
+        if (totalSeconds <= 60) {
+            countdownEl.style.background = 'linear-gradient(135deg,#fecaca,#fee2e2)';
+        }
+        if (totalSeconds <= 0) {
+            clearInterval(interval);
+            countdownEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> HẾT HẠN';
+            statusAlert.className = 'status-alert';
+            statusAlert.style.background = 'linear-gradient(135deg,#fee2e2,#fecaca)';
+            statusAlert.style.color = '#991b1b';
+            statusAlert.style.border = '1px solid #fca5a5';
+            statusAlert.innerHTML = '<i class="fas fa-times-circle"></i> Đơn hàng đã tự động hủy. Đang chuyển hướng...';
+            document.getElementById('qrSection').style.display = 'none';
+            setTimeout(() => window.location.href = '/restaurant-page', 3000);
+        }
+    }, 1000);
+
+    // Simulate payment after 10s for demo
+    // setTimeout(() => {
+    //     isPaid = true; clearInterval(interval);
+    //     statusAlert.className = 'status-alert status-paid';
+    //     statusAlert.innerHTML = '<i class="fas fa-check-circle"></i> Thanh toán thành công!';
+    //     countdownEl.style.display = 'none';
+    // }, 10000);
+</script>
+</body>
+</html>

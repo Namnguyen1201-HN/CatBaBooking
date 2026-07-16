@@ -1,4 +1,4 @@
-using CatBaBooking.Models;
+
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -23,10 +23,61 @@ namespace CatBaBooking.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [Route("")]
+        [Route("home-page")]
+        public IActionResult HomePage()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View();
         }
+
+        [Route("homestay-page")]
+        public IActionResult Homestay()
+        {
+            return View();
+        }
+
+        [Route("homestay-detail")]
+        public IActionResult HomestayDetail()
+        {
+            return View();
+        }
+
+        [Route("restaurant-page")]
+        public IActionResult Restaurant()
+        {
+            return View();
+        }
+
+        [Route("restaurant-detail")]
+        public IActionResult RestaurantDetail()
+        {
+            return View();
+        }
+
+        [Route("checkout-restaurant")]
+        public IActionResult CheckoutRestaurant()
+        {
+            return View();
+        }
+
+        [Route("checkout-homestay")]
+        public IActionResult CheckoutHomestay()
+        {
+            return View();
+        }
+
+        [Route("booking-homestay")]
+        public IActionResult BookingHomestay()
+        {
+            return View();
+        }
+
+        [Route("confirmation-payment")]
+        public IActionResult ConfirmationPayment()
+        {
+            return View();
+        }
+
+        
     }
 }

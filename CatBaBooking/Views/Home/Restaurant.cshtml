@@ -1,0 +1,161 @@
+
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhà hàng tại Cát Bà - Cát Bà Booking</title>
+    <link rel="stylesheet" href="~/css/HomePage/home-style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .restaurants-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:20px;}
+        .restaurant-card{background-color:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08);overflow:hidden;transition:transform .3s ease,box-shadow .3s ease;display:flex;flex-direction:column;position:relative;}
+        .restaurant-card:hover{transform:translateY(-5px);box-shadow:0 8px 20px rgba(0,0,0,.12);}
+        .restaurant-card .card-image{position:relative;height:200px;}
+        .restaurant-card .card-image img{width:100%;height:100%;object-fit:cover;}
+        .restaurant-card .card-content{padding:16px;display:flex;flex-direction:column;flex-grow:1;}
+        .restaurant-card .detail-btn{text-decoration:none;position:absolute;bottom:16px;right:16px;background-color:#28a745;color:#ffffff;padding:6px 12px;border-radius:6px;font-size:.9rem;}
+        .restaurant-card .detail-btn:hover{background-color:#218838;color:#fff;}
+        .pagination{display:flex;justify-content:center;align-items:center;gap:8px;margin:30px 0;flex-wrap:wrap;}
+        .page-btn{min-width:40px;height:40px;padding:0 12px;border:1px solid #ddd;border-radius:6px;background:#fff;color:#6c757d;font-size:14px;text-decoration:none;display:flex;align-items:center;justify-content:center;transition:all .2s ease;cursor:pointer;}
+        .page-btn.active{background-color:#28a745;color:white;border-color:#28a745;font-weight:600;}
+        .page-btn:disabled{color:#aaa;background-color:#f8f9fa;cursor:not-allowed;}
+        @@media(max-width:992px){.restaurants-grid{grid-template-columns:repeat(2,1fr);}}
+        @@media(max-width:768px){.restaurants-grid{grid-template-columns:1fr;}}
+        .apply-filter-btn{background-color:#007bff;color:white;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;font-size:.95rem;margin-top:16px;width:100%;}
+        .apply-filter-btn:hover{background-color:#0056b3;}
+    </style>
+</head>
+<body>
+    @await Html.PartialAsync("Sidebar")
+
+    <form action="/restaurant-page" method="GET" id="restaurant-search-form">
+        <section class="hero">
+            <div class="hero-overlay"></div><div class="hero-bg"></div>
+            <div class="container"><div class="hero-content">
+                <div class="hero-text"><h1>Nhà hàng tại Cát Bà</h1><p>Khám phá ẩm thực đặc sắc và đặt bàn trực tuyến</p></div>
+                <div class="search-forms"><div class="search-form active">
+                    <div class="form-tabs">
+                        <button type="button" class="form-tab active"><i class="fas fa-utensils"></i><span>Tất cả</span></button>
+                        <button type="button" class="form-tab"><span>Hải sản</span></button>
+                        <button type="button" class="form-tab"><span>Món Việt</span></button>
+                        <button type="button" class="form-tab"><span>BBQ</span></button>
+                    </div>
+                    <div class="form-grid" style="display:flex;flex-wrap:wrap;gap:15px;align-items:end;">
+                        <div class="form-field" style="flex:0 0 200px;"><label>Loại hình</label><div class="input-wrapper"><i class="fas fa-utensils"></i><select name="restaurantType" class="form-select"><option value="">Loại nhà hàng</option><option value="1">Hải sản</option><option value="2">Món Việt</option><option value="3">BBQ</option></select></div></div>
+                        <div class="form-field" style="flex:0 0 220px;"><label>Khu vực</label><div class="input-wrapper"><i class="fas fa-map-marker-alt"></i><select name="areaId" class="form-select"><option value="0">Chọn khu vực</option><option value="1">Cát Cò 1</option><option value="2">Trung tâm</option></select></div></div>
+                        <div class="form-field" style="flex:0 0 180px;"><label>Ngày đặt bàn</label><div class="input-wrapper"><i class="fas fa-calendar"></i><input type="date" name="date" class="form-input"></div></div>
+                        <div class="form-field" style="flex:0 0 150px;"><label>Giờ</label><div class="input-wrapper"><i class="fas fa-clock"></i><input type="time" name="time" class="form-input"></div></div>
+                        <div class="form-field" style="flex:0 0 100px;"><label>Số người</label><div class="input-wrapper"><i class="fas fa-users"></i><input type="number" name="numGuests" class="form-input" min="1"></div></div>
+                        <div class="form-field" style="flex:0 0 150px;"><button type="submit" class="search-btn"><i class="fas fa-search"></i> Tìm nhà hàng</button></div>
+                    </div>
+                </div></div>
+            </div></div>
+        </section>
+
+        <div class="container"><div class="main-content"><div class="content-layout">
+            <div class="sidebar">
+                <div class="filter-section">
+                    <div class="filter-header"><i class="fas fa-sliders-h"></i><h3>Bộ lọc</h3></div>
+                    <div class="filter-group">
+                        <h4>Đánh giá</h4>
+                        <div class="filter-options">
+                            <label class="filter-option"><input type="checkbox" name="minRating" value="5"><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span>5 sao</span></div></label>
+                            <label class="filter-option"><input type="checkbox" name="minRating" value="4"><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span>4+ sao</span></div></label>
+                            <label class="filter-option"><input type="checkbox" name="minRating" value="3"><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div><span>3+ sao</span></div></label>
+                        </div>
+                    </div>
+                    <button type="submit" class="apply-filter-btn">Áp dụng bộ lọc</button>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div class="results-header">
+                    <div class="results-info"><h2>Nhà hàng tại Cát Bà</h2><p>Tìm thấy <span>6</span> nhà hàng</p></div>
+                    <div class="results-controls"><div class="sort-control"><label>Sắp xếp:</label><select class="sort-select"><option>Phù hợp nhất</option><option>Đánh giá cao nhất</option></select></div></div>
+                </div>
+                <div class="popular-filters">
+                    <span class="filter-tag">Hải sản tươi</span><span class="filter-tag">Món Việt</span><span class="filter-tag">BBQ</span><span class="filter-tag">View đẹp</span>
+                </div>
+
+                <div class="restaurants-grid">
+                    <div class="restaurant-card">
+                        <div class="card-image"><img src="https://images.unsplash.com/photo-1514190051997-0f6f39ca5cde?w=400&h=250&fit=crop" alt="Hải Sản Cát Bà"><div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div></div>
+                        <div class="card-content">
+                            <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div><span class="reviews">(215)</span></div></div>
+                            <h3>Nhà hàng Hải Sản Cát Bà</h3>
+                            <div class="cuisines"><span class="specialty">Hải sản</span></div>
+                            <div class="location"><i class="fas fa-map-marker-alt"></i> Cát Cò 1</div>
+                            <a class="detail-btn" href="/restaurant-detail">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="restaurant-card">
+                        <div class="card-image"><img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&h=250&fit=crop" alt="Đảo Xanh"><div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div></div>
+                        <div class="card-content">
+                            <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span class="reviews">(142)</span></div></div>
+                            <h3>Quán Đảo Xanh</h3>
+                            <div class="cuisines"><span class="specialty">Món Việt</span></div>
+                            <div class="location"><i class="fas fa-map-marker-alt"></i> Bến Bèo</div>
+                            <a class="detail-btn" href="/restaurant-detail">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="restaurant-card">
+                        <div class="card-image"><img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=250&fit=crop" alt="BBQ Biển"><div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div></div>
+                        <div class="card-content">
+                            <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span class="reviews">(89)</span></div></div>
+                            <h3>BBQ Biển Cát Bà</h3>
+                            <div class="cuisines"><span class="specialty">BBQ</span></div>
+                            <div class="location"><i class="fas fa-map-marker-alt"></i> Cát Cò 3</div>
+                            <a class="detail-btn" href="/restaurant-detail">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="restaurant-card">
+                        <div class="card-image"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=250&fit=crop" alt="Nhà Hàng Biển Đông"><div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div></div>
+                        <div class="card-content">
+                            <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span class="reviews">(76)</span></div></div>
+                            <h3>Nhà Hàng Biển Đông</h3>
+                            <div class="cuisines"><span class="specialty">Hải sản</span></div>
+                            <div class="location"><i class="fas fa-map-marker-alt"></i> Cát Cò 2</div>
+                            <a class="detail-btn" href="/restaurant-detail">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="restaurant-card">
+                        <div class="card-image"><img src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=250&fit=crop" alt="Phố Biển Cát Bà"><div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div></div>
+                        <div class="card-content">
+                            <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i></div><span class="reviews">(53)</span></div></div>
+                            <h3>Phố Biển Cát Bà</h3>
+                            <div class="cuisines"><span class="specialty">Món Việt</span></div>
+                            <div class="location"><i class="fas fa-map-marker-alt"></i> Trung tâm</div>
+                            <a class="detail-btn" href="/restaurant-detail">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="restaurant-card">
+                        <div class="card-image"><img src="https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=400&h=250&fit=crop" alt="Lẩu Hải Sản"><div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div></div>
+                        <div class="card-content">
+                            <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span class="reviews">(134)</span></div></div>
+                            <h3>Lẩu Hải Sản Cát Bà</h3>
+                            <div class="cuisines"><span class="specialty">Lẩu</span></div>
+                            <div class="location"><i class="fas fa-map-marker-alt"></i> Bến Bèo</div>
+                            <a class="detail-btn" href="/restaurant-detail">Chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pagination">
+                    <button class="page-btn" disabled>Trước</button>
+                    <a href="#" class="page-btn active">1</a>
+                    <a href="#" class="page-btn">2</a>
+                    <a href="#" class="page-btn">Sau</a>
+                </div>
+            </div>
+        </div></div></div>
+    </form>
+
+    @await Html.PartialAsync("Footer")
+</body>
+</html>
