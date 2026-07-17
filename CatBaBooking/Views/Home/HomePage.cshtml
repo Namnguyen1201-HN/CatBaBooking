@@ -41,20 +41,21 @@ Layout = null;
     <div class="hero-overlay"></div>
     <div class="hero-bg"></div>
     <div class="container">
+
         <div class="hero-content">
             <div class="hero-text">
                 <h1>Khám phá vẻ đẹp Cát Bà</h1>
                 <p>Trải nghiệm homestay đích thực và ẩm thực địa phương</p>
             </div>
 
-            <div class="service-tabs">
+            @* <div class="service-tabs">
                 <div class="tabs-container">
                     <button class="tab-btn active" data-tab="homestay"><i class="fas fa-home"></i><span>Homestay</span></button>
                     <button class="tab-btn" data-tab="restaurant"><i class="fas fa-utensils"></i><span>Nhà hàng</span></button>
                 </div>
-            </div>
+            </div> *@
 
-            <div class="search-forms">
+            @* <div class="search-forms">
                 <!-- Homestay Search -->
                 <div class="search-form active" id="homestay-form">
                     <div class="form-tabs">
@@ -111,10 +112,10 @@ Layout = null;
                             </div>
                         </div>
                     </form>
-                </div>
+                </div> *@
 
                 <!-- Restaurant Search -->
-                <div class="search-form" id="restaurant-form">
+                @* <div class="search-form" id="restaurant-form">
                     <div class="form-tabs">
                         <button class="form-tab active"><i class="fas fa-utensils"></i><span>Tất cả</span></button>
                         <button class="form-tab"><span>Hải sản</span></button>
@@ -172,7 +173,7 @@ Layout = null;
                             </div>
                         </div>
                     </form>
-                </div>
+                </div> *@
             </div>
 
             <div class="hero-features">
@@ -186,6 +187,7 @@ Layout = null;
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
@@ -315,9 +317,9 @@ Layout = null;
                         <div class="restaurant-card">
                             <div class="card-image">
                                 <img src="@(restaurant.ThumbnailUrl ?? "/images/default-restaurant.jpg")" alt="@restaurant.Name" />
-                            </div>
-                            <div class="badge cuisine">
-                                <i class="fas fa-utensils"></i> Nhà hàng
+                                <div class="badge cuisine">
+                                    <i class="fas fa-utensils"></i> Nhà hàng
+                                </div>
                             </div>
                            
                             <div class="card-content">
