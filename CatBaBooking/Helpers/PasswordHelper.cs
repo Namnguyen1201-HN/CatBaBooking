@@ -1,32 +1,24 @@
+using System.Text.RegularExpressions;
+
 namespace CatBaBooking.Helpers;
 
-/// <summary>
-/// Tiện ích hash và verify mật khẩu.
-/// 
-/// [HƯỚNG DẪN] Cài NuGet package BCrypt.Net-Next:
-///   Tools → NuGet Package Manager → Manage NuGet → tìm "BCrypt.Net-Next" → Install
-/// 
-/// Sau đó bỏ comment phần implementation bên dưới.
-/// </summary>
 public static class PasswordHelper
 {
-    /// <summary>
-    /// Hash mật khẩu plain-text thành chuỗi hash an toàn.
-    /// Lưu chuỗi hash này vào DB, KHÔNG bao giờ lưu plain-text.
-    /// </summary>
-    public static string Hash(string plainPassword)
+    public static string HashPassword(string password)
     {
-        // TODO: return BCrypt.Net.BCrypt.HashPassword(plainPassword);
-        throw new NotImplementedException();
+        return BCrypt.Net.BCrypt.HashPassword(password);
     }
 
-    /// <summary>
-    /// Xác nhận mật khẩu người dùng nhập có khớp với hash trong DB không.
-    /// Dùng khi Login hoặc đổi mật khẩu.
-    /// </summary>
-    public static bool Verify(string plainPassword, string hashedPassword)
+    public static bool VerifyPassword(string password, string hashPassword)
     {
-        // TODO: return BCrypt.Net.BCrypt.Verify(plainPassword, hashedPassword);
-        throw new NotImplementedException();
+        return BCrypt.Net.BCrypt.Verify(password, hashPassword);
+    }
+
+    public static bool IsStrongPassword(string password)
+    {
+        if (string.IsNullOrEmpty(password))
+            return false;
+        string pattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$";
+        return Regex.IsMatch(password, pattern);
     }
 }

@@ -1,0 +1,187 @@
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Lịch sử Booking</title>
+    <link rel="stylesheet" href="~/css/Admin/admin-style.css">
+    <style>
+        .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+        .page-header h1 { font-size:28px; color:#0f172a; margin:0; }
+        .filters-section { background:#fff; border-radius:12px; padding:20px; margin-bottom:24px; border:1px solid #e2e8f0; }
+        .filters-form { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; align-items:end; }
+        .filter-group { display:flex; flex-direction:column; }
+        .filter-group label { font-size:13px; color:#64748b; margin-bottom:6px; font-weight:500; }
+        .filter-group select, .filter-group input { padding:10px 12px; border:1px solid #e2e8f0; border-radius:6px; font-size:14px; }
+        .filter-group input:focus, .filter-group select:focus { outline:none; border-color:#3b82f6; }
+        .btn-filter { padding:10px 20px; background:#3b82f6; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:14px; font-weight:500; }
+        .btn-filter:hover { background:#2563eb; }
+        .bookings-table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0; }
+        .bookings-table thead { background:#f8fafc; }
+        .bookings-table th { padding:14px 16px; text-align:left; font-size:12px; color:#475569; text-transform:uppercase; font-weight:600; border-bottom:2px solid #e2e8f0; }
+        .bookings-table td { padding:14px 16px; font-size:14px; color:#334155; border-bottom:1px solid #e2e8f0; }
+        .bookings-table tbody tr:hover { background:#f8fafc; }
+        .bookings-table tbody tr:last-child td { border-bottom:none; }
+        .status-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:600; text-transform:uppercase; }
+        .status-badge.pending { background:#fef3c7; color:#b45309; }
+        .status-badge.confirmed { background:#dcfce7; color:#166534; }
+        .status-badge.cancelled { background:#fee2e2; color:#b91c1c; }
+        .pagination { display:flex; justify-content:center; align-items:center; gap:8px; margin-top:24px; }
+        .pagination a, .pagination span { padding:8px 12px; border:1px solid #e2e8f0; border-radius:6px; text-decoration:none; color:#334155; font-size:14px; }
+        .pagination a:hover { background:#f8fafc; }
+        .pagination .current { background:#3b82f6; color:#fff; border-color:#3b82f6; }
+        .info-badge { display:inline-block; padding:4px 8px; background:#e0e7ff; color:#3730a3; border-radius:4px; font-size:12px; font-weight:500; }
+        .table-footer { padding:16px; background:#f8fafc; border-top:1px solid #e2e8f0; color:#64748b; font-size:14px; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">Admin Panel</div>
+        <div class="user-info">
+            <div class="user-avatar">A</div>
+            <span class="user-name">Admin</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/dash-board">Dashboard</a></li>
+            <li class="active"><a href="/booking-history">Lịch sử Booking</a></li>
+            <li><a href="/approve-application">Duyệt Yêu Cầu</a></li>
+            <li><a href="/user-management">Quản Lý Người Dùng</a></li>
+            <li><a href="/permissions-manager">Quản Lý Phân Quyền</a></li>
+            <li><a href="/feedback-management">Quản Lý Phản Hồi</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button type="button" class="logout-btn">Đăng xuất</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1>Lịch sử Booking</h1>
+                <p style="color:#64748b; margin-top:6px; font-size:14px;">Quản lý tất cả đơn đặt phòng và đặt bàn trong hệ thống</p>
+            </div>
+        </div>
+
+        <div class="filters-section">
+            <div class="filters-form">
+                <div class="filter-group">
+                    <label>Trạng thái</label>
+                    <select>
+                        <option value="all">Tất cả</option>
+                        <option value="confirmed">Đã xác nhận</option>
+                        <option value="cancelled_by_user">Đã hủy (User)</option>
+                        <option value="cancelled_by_owner">Đã hủy (Owner)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Loại hình</label>
+                    <select>
+                        <option value="all">Tất cả</option>
+                        <option value="homestay">Homestay</option>
+                        <option value="restaurant">Nhà hàng</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Tìm kiếm</label>
+                    <input type="text" placeholder="Mã booking, tên, email, SĐT...">
+                </div>
+                <div class="filter-group">
+                    <button type="button" class="btn-filter">Lọc</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; overflow:hidden;">
+            <table class="bookings-table">
+                <thead>
+                    <tr>
+                        <th>Mã Booking</th>
+                        <th>Khách hàng</th>
+                        <th>Cơ sở</th>
+                        <th>Loại hình</th>
+                        <th>Số khách</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày đặt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>#BK2025001</strong></td>
+                        <td>Nguyễn Văn An<br><small style="color:#94a3b8;">an.nguyen@email.com</small></td>
+                        <td>Homestay Đà Lạt Xanh<br><small style="color:#94a3b8;">45 Trần Phú, Đà Lạt</small></td>
+                        <td><span class="info-badge">Homestay</span></td>
+                        <td>3 người</td>
+                        <td><strong>₫2,400,000</strong></td>
+                        <td><span style="color:#166534; font-weight:500;">Đã thanh toán</span></td>
+                        <td><span class="status-badge confirmed">Đã xác nhận</span></td>
+                        <td>01/06/2025</td>
+                    </tr>
+                    <tr>
+                        <td><strong>#BK2025002</strong></td>
+                        <td>Trần Thị Bình<br><small style="color:#94a3b8;">binh.tran@email.com</small></td>
+                        <td>Nhà hàng Phố Cổ<br><small style="color:#94a3b8;">12 Hội An, Quảng Nam</small></td>
+                        <td><span class="info-badge">Nhà hàng</span></td>
+                        <td>6 người</td>
+                        <td><strong>₫1,800,000</strong></td>
+                        <td><span style="color:#b45309; font-weight:500;">Thanh toán một phần</span></td>
+                        <td><span class="status-badge pending">Đang chờ</span></td>
+                        <td>03/06/2025</td>
+                    </tr>
+                    <tr>
+                        <td><strong>#BK2025003</strong></td>
+                        <td>Lê Minh Cường<br><small style="color:#94a3b8;">cuong.le@email.com</small></td>
+                        <td>Homestay Hội An Garden<br><small style="color:#94a3b8;">Hội An, Quảng Nam</small></td>
+                        <td><span class="info-badge">Homestay</span></td>
+                        <td>2 người</td>
+                        <td><strong>₫3,200,000</strong></td>
+                        <td><span style="color:#b91c1c; font-weight:500;">Chưa thanh toán</span></td>
+                        <td><span class="status-badge cancelled">Đã hủy</span></td>
+                        <td>05/06/2025</td>
+                    </tr>
+                    <tr>
+                        <td><strong>#BK2025004</strong></td>
+                        <td>Phạm Thu Dung<br><small style="color:#94a3b8;">dung.pham@email.com</small></td>
+                        <td>Quán Ăn Bà Ngoại<br><small style="color:#94a3b8;">18 Lê Lợi, TP.HCM</small></td>
+                        <td><span class="info-badge">Nhà hàng</span></td>
+                        <td>4 người</td>
+                        <td><strong>₫950,000</strong></td>
+                        <td><span style="color:#166534; font-weight:500;">Đã thanh toán</span></td>
+                        <td><span class="status-badge confirmed">Đã xác nhận</span></td>
+                        <td>06/06/2025</td>
+                    </tr>
+                    <tr>
+                        <td><strong>#BK2025005</strong></td>
+                        <td>Hoàng Quốc Việt<br><small style="color:#94a3b8;">viet.hoang@email.com</small></td>
+                        <td>Villa Sapa Mist<br><small style="color:#94a3b8;">Sapa, Lào Cai</small></td>
+                        <td><span class="info-badge">Homestay</span></td>
+                        <td>5 người</td>
+                        <td><strong>₫5,600,000</strong></td>
+                        <td><span style="color:#166534; font-weight:500;">Đã thanh toán</span></td>
+                        <td><span class="status-badge confirmed">Đã xác nhận</span></td>
+                        <td>07/06/2025</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <span style="color:#999;">« Trước</span>
+                <span class="current">1</span>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <a href="#">Sau »</a>
+            </div>
+
+            <div class="table-footer">
+                Tổng số: <strong>3,410</strong> booking
+            </div>
+        </div>
+    </div>
+</body>
+</html>
