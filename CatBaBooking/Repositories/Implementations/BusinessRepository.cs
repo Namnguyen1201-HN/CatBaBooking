@@ -42,11 +42,15 @@ public class BusinessRepository : IBusinessRepository
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<Business>> GetHomestaysAsync(int page, int pageSize)
+    public async Task<IEnumerable<Business>> GetHomestaysAsync(int page, int pageSize)
     {
-        // TODO: .Where(b => b.BusinessType == "Homestay")
-        //        .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync()
-        throw new NotImplementedException();
+        return await _context.Businesses
+            .Where(b => b.Type == "homestay" && b.Status == "active")
+            .OrderByDescending(b => b.AvgRating)
+            .Include(b => b.Area)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public Task<IEnumerable<Business>> GetRestaurantsAsync(int page, int pageSize)
@@ -56,10 +60,10 @@ public class BusinessRepository : IBusinessRepository
         throw new NotImplementedException();
     }
 
-    public Task<int> CountHomestaysAsync()
+    public async Task<int> CountHomestaysAsync()
     {
-        // TODO: .CountAsync(b => b.BusinessType == "Homestay" && b.Status == "approved")
-        throw new NotImplementedException();
+        return await _context.Businesses
+                     .CountAsync(b => b.Type == "homestay" && b.Status == "active");
     }
 
     public Task<int> CountRestaurantsAsync()

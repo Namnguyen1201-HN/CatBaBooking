@@ -1,7 +1,8 @@
-
 @{
     Layout = null;
 }
+@model CatBaBooking.ViewModels.Homestay.HomestayListViewModel
+
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -46,7 +47,7 @@
                     @* <button class="form-tab"><span>Villa</span></button>
                     <button class="form-tab"><span>Phòng đôi</span></button> *@
                 </div>
-                <form action="/homestay-page" method="GET">
+                <form action="/homestay" method="GET">
                     <div class="form-grid" style="display:flex;flex-wrap:wrap;gap:15px;align-items:end;">
                         <div class="form-field" style="flex:0 0 200px;"><label>Khu vực</label><div class="input-wrapper"><i class="fas fa-map-marker-alt"></i><select name="areaId" class="form-select"><option value="0">Tất cả khu vực</option><option value="1">Cát Cò 1</option><option value="2">Cát Cò 2</option></select></div></div>
                         <div class="form-field" style="flex:0 0 220px;"><label>Ngày nhận</label><div class="input-wrapper"><i class="fas fa-calendar"></i><input type="date" name="checkIn" class="form-input"></div></div>
@@ -65,6 +66,7 @@
     <div class="container">
         <div class="main-content">
             <div class="content-layout">
+
                 <div class="sidebar">
                     <div class="filter-section">
                         <div class="filter-header"><i class="fas fa-sliders-h"></i><h3>Bộ lọc</h3></div>
@@ -101,79 +103,102 @@
 
                 <div class="results-section">
                     <div class="results-header">
-                        <div class="results-info"><h2>Homestay tại Cát Bà</h2><p>Tìm thấy <span>6</span> homestay</p></div>
-                        <div class="results-controls">
-                            <div class="sort-control"><label>Sắp xếp:</label><select class="sort-select"><option>Phù hợp nhất</option><option>Giá thấp đến cao</option><option>Giá cao đến thấp</option><option>Đánh giá cao nhất</option></select></div>
+                        <div class="results-info">
+                            <h2>Homestay tại Cát Bà</h2>
+                            <p>Tìm thấy <span>@Model.TotalCount</span> homestay.</p>
                         </div>
                     </div>
-                    @* <div class="popular-filters">
-                        <span class="filter-tag">View biển</span><span class="filter-tag">WiFi miễn phí</span><span class="filter-tag">Bữa sáng</span><span class="filter-tag">Chỗ đậu xe</span>
-                    </div> *@
+
+                    <div class="results-controls">
+                        <div class="sort-control">
+                            <label>Sắp xếp</label>
+                            <select class="sort-select">
+                                <option>Phù hợp nhất</option>
+                                <option>Giá thấp đến cao</option>
+                                <option>Giá cao đến thấp</option>
+                                <option>Đánh giá cao nhất</option>
+                            </select>
+                        </div>
+                    </div>
 
                     <div class="homestay-grid">
-                        <div class="homestay-card">
-                            <div class="card-image"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=250&fit=crop" alt="Ocean View"><div class="badge type"><i class="fas fa-home"></i> Homestay</div></div>
-                            <div class="card-content">
-                                <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div><span class="reviews">(128)</span></div><span class="price-range">850,000</span></div>
-                                <h3>Homestay Ocean View Cát Bà</h3>
-                                <div class="location"><i class="fas fa-map-marker-alt"></i> Cát Cò 1</div>
+                        @if (!Model.Items.Any())
+                        {
+                            <p style="grid-column:1/-1;text-align:center;color:#6c757d;">
+                                Không tìm thấy homestay phù hợp.
+                            </p>
+                        }
+                        @foreach (var homestay in Model.Items)
+                        {
+                            <div class="homestay-card">
+                                <div class="card-image">
+                                    <img src="@(homestay.ThumbnailUrl ?? "/images/placeholder-homestay.jpg")"
+                                         alt="@homestay.Name">
+                                    <div class="badge type"><i class="fas fa-home"></i> Homestay</div>
+                                </div>
+                                <div class="card-content">
+                                    <div class="rating-price">
+                                        <div class="rating">
+                                            <div class="stars">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    if (i <= Math.Floor(homestay.AverageRating))
+                                                    {
+                                                        <i class="fas fa-star"></i>
+                                                    }
+                                                    else if (i - homestay.AverageRating < 1 && i - homestay.AverageRating > 0)
+                                                    {
+                                                        <i class="fas fa-star-half-alt"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="far fa-star"></i>
+                                                    }
+                                                }
+                                            </div>
+                                            <span class="reviews">(@homestay.ReviewCount)</span>
+                                        </div>
+                                        <span class="price-range">
+                                            @homestay.PriceFrom.ToString("N0") ₫
+                                        </span>
+                                    </div>
+                                    <h3>@homestay.Name</h3>
+                                    <div class="location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        @(homestay.AreaName ?? homestay.Address)
+                                    </div>
+                                </div>
+                                <a class="detail-btn" href="/homestay/detail/@homestay.BusinessId">Chi tiết</a>
                             </div>
-                            <a class="detail-btn" href="/homestay-detail">Chi tiết</a>
-                        </div>
-                        <div class="homestay-card">
-                            <div class="card-image"><img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=250&fit=crop" alt="Villa"><div class="badge type"><i class="fas fa-home"></i> Homestay</div></div>
-                            <div class="card-content">
-                                <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span class="reviews">(94)</span></div><span class="price-range">1,200,000</span></div>
-                                <h3>Villa Hải Đăng Cát Bà</h3>
-                                <div class="location"><i class="fas fa-map-marker-alt"></i> Cát Cò 2</div>
-                            </div>
-                            <a class="detail-btn" href="/homestay-detail">Chi tiết</a>
-                        </div>
-                        <div class="homestay-card">
-                            <div class="card-image"><img src="https://images.unsplash.com/photo-1549294413-26f195200c16?w=400&h=250&fit=crop" alt="Biển Xanh"><div class="badge type"><i class="fas fa-home"></i> Homestay</div></div>
-                            <div class="card-content">
-                                <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span class="reviews">(67)</span></div><span class="price-range">650,000</span></div>
-                                <h3>Homestay Biển Xanh</h3>
-                                <div class="location"><i class="fas fa-map-marker-alt"></i> Bến Bèo</div>
-                            </div>
-                            <a class="detail-btn" href="/homestay-detail">Chi tiết</a>
-                        </div>
-                        <div class="homestay-card">
-                            <div class="card-image"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&h=250&fit=crop" alt="Sơn Ca"><div class="badge type"><i class="fas fa-home"></i> Homestay</div></div>
-                            <div class="card-content">
-                                <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span class="reviews">(43)</span></div><span class="price-range">750,000</span></div>
-                                <h3>Homestay Sơn Ca</h3>
-                                <div class="location"><i class="fas fa-map-marker-alt"></i> Cát Cò 3</div>
-                            </div>
-                            <a class="detail-btn" href="/homestay-detail">Chi tiết</a>
-                        </div>
-                        <div class="homestay-card">
-                            <div class="card-image"><img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=250&fit=crop" alt="Đảo Ngọc"><div class="badge type"><i class="fas fa-home"></i> Homestay</div></div>
-                            <div class="card-content">
-                                <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i></div><span class="reviews">(56)</span></div><span class="price-range">490,000</span></div>
-                                <h3>Homestay Đảo Ngọc</h3>
-                                <div class="location"><i class="fas fa-map-marker-alt"></i> Bến Bèo</div>
-                            </div>
-                            <a class="detail-btn" href="/homestay-detail">Chi tiết</a>
-                        </div>
-                        <div class="homestay-card">
-                            <div class="card-image"><img src="https://images.unsplash.com/photo-1501183638710-841dd1904471?w=400&h=250&fit=crop" alt="Lưng Chừng Trời"><div class="badge type"><i class="fas fa-home"></i> Homestay</div></div>
-                            <div class="card-content">
-                                <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span class="reviews">(112)</span></div><span class="price-range">1,500,000</span></div>
-                                <h3>Homestay Lưng Chừng Trời</h3>
-                                <div class="location"><i class="fas fa-map-marker-alt"></i> Pháo Đài</div>
-                            </div>
-                            <a class="detail-btn" href="/homestay-detail">Chi tiết</a>
-                        </div>
+                        }
                     </div>
 
                     <div class="pagination">
-                        <button class="page-btn" disabled>Trước</button>
-                        <a href="#" class="page-btn active">1</a>
-                        <a href="#" class="page-btn">2</a>
-                        <a href="#" class="page-btn">Sau</a>
+                        @if (Model.CurrentPage > 1)
+                        {
+                            <a href="?page=@(Model.CurrentPage - 1)" class="page-btn">Trước</a>
+                        }
+                        else
+                        {
+                            <button class="page-btn" disabled>Trước</button>
+                        }
+                        @for (int p = 1; p <= Model.TotalPages; p++)
+                        {
+                            <a href="?page=@p"
+                               class="page-btn @(p == Model.CurrentPage ? "active" : "")">@p</a>
+                        }
+                        @if (Model.CurrentPage < Model.TotalPages)
+                        {
+                            <a href="?page=@(Model.CurrentPage + 1)" class="page-btn">Sau</a>
+                        }
+                        else
+                        {
+                            <button class="page-btn" disabled>Sau</button>
+                        }
                     </div>
+
                 </div>
+
             </div>
         </div>
     </div>

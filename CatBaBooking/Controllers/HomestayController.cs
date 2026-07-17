@@ -21,10 +21,9 @@ public class HomestayController : Controller
     [Route("homestay")]
     public async Task<IActionResult> Index(int page = 1)
     {
-        // TODO:
-        // var viewModel = await _businessService.GetHomestayListAsync(page, pageSize: 9);
-        // return View(viewModel);
-        throw new NotImplementedException();
+        const int pageSize = 6;
+        var viewModel = await _businessService.GetHomestayListAsync(page, pageSize);
+        return View("~/Views/Home/Homestay.cshtml", viewModel);
     }
 
     /// <summary>Trang chi tiết homestay — GET /homestay/detail/5</summary>

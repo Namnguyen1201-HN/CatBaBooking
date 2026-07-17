@@ -34,12 +34,32 @@ public class BusinessService : IBusinessService
 
     public async Task<HomestayListViewModel> GetHomestayListAsync(int page, int pageSize)
     {
-        // TODO:
-        // 1. Lấy danh sách homestay: _businessRepository.GetHomestaysAsync(page, pageSize)
-        // 2. Đếm tổng: _businessRepository.CountHomestaysAsync()
-        // 3. Map từng Business → HomestayCardViewModel
-        // 4. Trả về HomestayListViewModel { Items, TotalCount, CurrentPage, PageSize }
-        throw new NotImplementedException();
+        //1. Lấy dữ liệu phân trang từ repository
+        var businesses = await _businessRepository.GetHomestaysAsync(page, pageSize);
+        var totalCount = await _businessRepository.CountHomestaysAsync();
+
+        //2. Map entity -> ViewModel (gọi .ToList() để materialize ngay, tránh lazy execution trong View)
+        var items = businesses.Select(b => new HomestayCardViewModel
+        {
+            BusinessId   = b.BusinessId,
+            Name         = b.Name,
+            ThumbnailUrl = b.Image,
+            Address      = b.Address ?? "",
+            AreaName     = b.Area?.Name,
+            PriceFrom    = b.PricePerNight ?? 0,
+            AverageRating = (double)(b.AvgRating ?? 0),
+            ReviewCount  = b.ReviewCount ?? 0
+        }).ToList();
+
+        //3. Trả về HomestayListViewModel
+        return new HomestayListViewModel
+        {
+            Items = items,
+            TotalCount = totalCount,
+            CurrentPage = page,
+            PageSize = pageSize
+        };
+
     }
 
     public async Task<HomestayDetailViewModel?> GetHomestayDetailAsync(int businessId)

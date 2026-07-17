@@ -38,11 +38,6 @@ namespace CatBaBooking.Controllers
             return View();
         }
 
-        [Route("homestay-page")]
-        public IActionResult Homestay()
-        {
-            return View();
-        }
 
         [Route("homestay-detail")]
         public IActionResult HomestayDetail()
