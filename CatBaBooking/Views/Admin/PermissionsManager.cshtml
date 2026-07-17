@@ -1,0 +1,266 @@
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Quản Lý Phân Quyền</title>
+    <link rel="stylesheet" href="~/css/Admin/admin-style.css">
+    <style>
+        .main-content { margin-left:250px; flex-grow:1; padding:20px; }
+        main { padding:20px; background-color:#fff; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); margin-top:20px; }
+        h2 { color:#001529; margin-bottom:20px; font-size:24px; border-bottom:2px solid #1890ff; padding-bottom:10px; }
+        .action-bar { display:flex; gap:15px; margin-bottom:20px; align-items:center; background-color:#f8f9fa; padding:15px; border-radius:8px; }
+        .search-box { flex:1; display:flex; align-items:center; }
+        .search-box input { flex:1; padding:10px 15px; border:2px solid #e9ecef; border-radius:6px; font-size:14px; }
+        .search-box input:focus { outline:none; border-color:#1890ff; }
+        .btn-add, .btn-save { padding:10px 20px; color:white; border:none; border-radius:6px; cursor:pointer; font-size:14px; font-weight:500; white-space:nowrap; }
+        .btn-add { background-color:#1890ff; }
+        .btn-add:hover { background-color:#096dd9; }
+        .btn-save { background-color:#52c41a; }
+        .btn-save:hover { background-color:#389e0d; }
+        .role-table { width:100%; border-collapse:collapse; margin-top:10px; }
+        .role-table thead { background-color:#fafafa; }
+        .role-table th, .role-table td { padding:12px; text-align:center; border:1px solid #e5e7eb; font-size:14px; }
+        .role-table th { font-weight:600; color:#333; }
+        .role-table tbody tr:hover { background-color:#f5f5f5; }
+        .role-table th:first-child, .role-table td:first-child { width:60px; }
+        .role-table th:nth-child(2), .role-table td:nth-child(2) { text-align:left; width:200px; }
+        .role-table th:nth-child(3), .role-table td:nth-child(3) { text-align:left; font-family:'Courier New',monospace; font-size:13px; color:#666; }
+        .permission-checkbox { width:18px; height:18px; cursor:pointer; accent-color:#1890ff; }
+        .action-buttons { display:flex; gap:8px; justify-content:center; }
+        .btn-edit, .btn-delete { padding:6px 12px; border:none; border-radius:4px; cursor:pointer; font-size:13px; color:white; }
+        .btn-edit { background-color:#1890ff; }
+        .btn-edit:hover { background-color:#096dd9; }
+        .btn-delete { background-color:#ff4d4f; }
+        .btn-delete:hover { background-color:#d9363e; }
+        .message { padding:12px 20px; border-radius:6px; margin-bottom:20px; font-size:14px; }
+        .success-message { background-color:#f6ffed; border:1px solid #b7eb8f; color:#52c41a; }
+        .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); }
+        .modal-content { background-color:#fff; margin:15% auto; padding:0; border-radius:8px; width:80%; max-width:500px; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
+        .modal-header { padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; }
+        .modal-header h3 { margin:0; color:#001529; }
+        .close { color:#aaa; font-size:28px; font-weight:bold; cursor:pointer; }
+        .close:hover { color:#000; }
+        .modal-body { padding:20px; }
+        .form-group { margin-bottom:15px; }
+        .form-group label { display:block; margin-bottom:5px; font-weight:500; color:#333; }
+        .form-group input { width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:14px; box-sizing:border-box; }
+        .form-group input:focus { outline:none; border-color:#1890ff; }
+        .modal-footer { padding:15px; border-top:1px solid #eee; text-align:right; }
+        .modal-footer button { padding:8px 16px; margin-left:10px; border:none; border-radius:4px; cursor:pointer; font-size:14px; }
+        #cancelBtn { background-color:#f0f0f0; color:#333; }
+        #saveBtn { background-color:#1890ff; color:white; }
+        .pagination { display:flex; justify-content:center; align-items:center; margin-top:20px; gap:5px; }
+        .pagination a, .pagination span { padding:8px 12px; border:1px solid #e5e7eb; border-radius:4px; text-decoration:none; color:#333; }
+        .pagination a:hover { background-color:#1890ff; color:white; border-color:#1890ff; }
+        .pagination .active { background-color:#1890ff; color:white; border-color:#1890ff; }
+        .pagination .disabled { color:#999; cursor:not-allowed; pointer-events:none; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">Admin Panel</div>
+        <div class="user-info">
+            <div class="user-avatar">A</div>
+            <span class="user-name">Admin</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/dash-board">Dashboard</a></li>
+            <li><a href="/booking-history">Lịch sử Booking</a></li>
+            <li><a href="/approve-application">Duyệt Yêu Cầu</a></li>
+            <li><a href="/user-management">Quản Lý Người Dùng</a></li>
+            <li class="active"><a href="/permissions-manager">Quản Lý Phân Quyền</a></li>
+            <li><a href="/feedback-management">Quản Lý Phản Hồi</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button type="button" class="logout-btn">Đăng xuất</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <main>
+            <h2>Quản Lý Phân Quyền</h2>
+
+            <div class="action-bar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên chức năng hoặc URL...">
+                </div>
+                <button type="button" class="btn-add" onclick="showAddModal()">➕ Thêm URL</button>
+                <button type="button" class="btn-save">💾 Lưu Thay Đổi</button>
+            </div>
+
+            <table class="role-table">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên Chức Năng</th>
+                        <th>Đường dẫn URL</th>
+                        <th>Admin</th>
+                        <th>Owner</th>
+                        <th>Customer</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="permissionsTableBody">
+                    <tr>
+                        <td>1</td>
+                        <td>Dashboard</td>
+                        <td>/admin/dashboard</td>
+                        <td><input type="checkbox" class="permission-checkbox" checked></td>
+                        <td><input type="checkbox" class="permission-checkbox"></td>
+                        <td><input type="checkbox" class="permission-checkbox"></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-edit" onclick="editPermission(1,'Dashboard','/admin/dashboard')">Sửa</button>
+                                <button class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa URL này?')">Xóa</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Quản lý người dùng</td>
+                        <td>/user-management</td>
+                        <td><input type="checkbox" class="permission-checkbox" checked></td>
+                        <td><input type="checkbox" class="permission-checkbox"></td>
+                        <td><input type="checkbox" class="permission-checkbox"></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-edit" onclick="editPermission(2,'Quản lý người dùng','/user-management')">Sửa</button>
+                                <button class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa URL này?')">Xóa</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Duyệt yêu cầu</td>
+                        <td>/approve-application</td>
+                        <td><input type="checkbox" class="permission-checkbox" checked></td>
+                        <td><input type="checkbox" class="permission-checkbox"></td>
+                        <td><input type="checkbox" class="permission-checkbox"></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-edit" onclick="editPermission(3,'Duyệt yêu cầu','/approve-application')">Sửa</button>
+                                <button class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa URL này?')">Xóa</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Lịch sử Booking</td>
+                        <td>/admin/booking-history</td>
+                        <td><input type="checkbox" class="permission-checkbox" checked></td>
+                        <td><input type="checkbox" class="permission-checkbox" checked></td>
+                        <td><input type="checkbox" class="permission-checkbox"></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-edit" onclick="editPermission(4,'Lịch sử Booking','/admin/booking-history')">Sửa</button>
+                                <button class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa URL này?')">Xóa</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Quản lý phản hồi</td>
+                        <td>/admin/feedbacks</td>
+                        <td><input type="checkbox" class="permission-checkbox" checked></td>
+                        <td><input type="checkbox" class="permission-checkbox"></td>
+                        <td><input type="checkbox" class="permission-checkbox"></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-edit" onclick="editPermission(5,'Quản lý phản hồi','/admin/feedbacks')">Sửa</button>
+                                <button class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa URL này?')">Xóa</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Xem thông tin cá nhân</td>
+                        <td>/profile</td>
+                        <td><input type="checkbox" class="permission-checkbox" checked></td>
+                        <td><input type="checkbox" class="permission-checkbox" checked></td>
+                        <td><input type="checkbox" class="permission-checkbox" checked></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-edit" onclick="editPermission(6,'Xem thông tin cá nhân','/profile')">Sửa</button>
+                                <button class="btn-delete" onclick="return confirm('Bạn có chắc muốn xóa URL này?')">Xóa</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <span class="disabled">« Trước</span>
+                <span class="active">1</span>
+                <a href="#">2</a>
+                <a href="#">Sau »</a>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="permissionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Thêm URL Mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="name">Tên Chức Năng: <span style="color:red;">*</span></label>
+                    <input type="text" id="name" placeholder="Nhập tên chức năng">
+                </div>
+                <div class="form-group">
+                    <label for="url">Đường dẫn URL: <span style="color:red;">*</span></label>
+                    <input type="text" id="urlInput" placeholder="/example-url">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelBtn">Hủy</button>
+                <button type="button" id="saveBtn">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('permissionModal');
+        const closeBtn = document.querySelector('.close');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const title = document.getElementById('modalTitle');
+        const nameInput = document.getElementById('name');
+        const urlInput = document.getElementById('urlInput');
+
+        function showAddModal() {
+            nameInput.value = '';
+            urlInput.value = '';
+            title.textContent = 'Thêm URL Mới';
+            modal.style.display = 'block';
+        }
+        function editPermission(id, name, url) {
+            nameInput.value = name;
+            urlInput.value = url;
+            title.textContent = 'Sửa URL';
+            modal.style.display = 'block';
+        }
+        function closeModal() { modal.style.display = 'none'; }
+
+        closeBtn.onclick = closeModal;
+        cancelBtn.onclick = closeModal;
+        window.onclick = function(e) { if (e.target === modal) closeModal(); };
+
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const val = this.value.toLowerCase();
+            document.querySelectorAll('#permissionsTableBody tr').forEach(function(row) {
+                const n = row.cells[1]?.textContent.toLowerCase() || '';
+                const u = row.cells[2]?.textContent.toLowerCase() || '';
+                row.style.display = (n.includes(val) || u.includes(val)) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

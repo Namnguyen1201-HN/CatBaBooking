@@ -1,0 +1,384 @@
+@{
+Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Dashboard</title>
+    <link rel="stylesheet" href="~/css/Admin/admin-style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+        .page-header h1 { font-size:28px; color:#0f172a; margin:0; }
+        .page-subtitle { color:#64748b; margin-top:6px; }
+        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
+        .stat-card { background:#fff; border-radius:12px; padding:20px; border:1px solid #e2e8f0; box-shadow:0 8px 24px rgba(15,23,42,0.08); transition:transform 0.2s, box-shadow 0.2s; }
+        .stat-card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(15,23,42,0.12); }
+        .stat-label { font-size:12px; color:#64748b; margin-bottom:8px; text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
+        .stat-value { font-size:32px; font-weight:700; color:#0f172a; margin-bottom:6px; }
+        .stat-caption { font-size:13px; color:#94a3b8; }
+        .charts-section { margin-top:32px; }
+        .charts-section-title { font-size:18px; font-weight:700; color:#0f172a; margin-bottom:16px; }
+        .charts-row { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+        .chart-card { background:#fff; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 8px 24px rgba(15,23,42,0.06); overflow:hidden; }
+        .chart-card-header { padding:16px 20px; border-bottom:1px solid #e2e8f0; background:#f8fafc; display:flex; justify-content:space-between; align-items:center; }
+        .chart-card-header h3 { margin:0; font-size:15px; font-weight:700; color:#0f172a; }
+        .chart-card-header span { font-size:12px; color:#94a3b8; }
+        .chart-card-body { padding:20px; }
+        .chart-card-body canvas { max-height:260px; }
+        .chart-full { grid-column: 1 / -1; }
+        .donut-wrapper { display:flex; align-items:center; gap:24px; }
+        .donut-wrapper canvas { flex-shrink:0; max-width:200px; max-height:200px; }
+        .donut-legend { flex:1; }
+        .legend-item { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+        .legend-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+        .legend-label { font-size:13px; color:#334155; flex:1; }
+        .legend-value { font-size:13px; font-weight:700; color:#0f172a; }
+        .legend-pct { font-size:12px; color:#94a3b8; margin-left:4px; }
+        .activity-card { margin-top:20px; background:#fff; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 8px 24px rgba(15,23,42,0.06); overflow:hidden; }
+        .activity-card header { padding:20px 24px; border-bottom:1px solid #e2e8f0; background:#f8fafc; }
+        .activity-card h2 { margin:0; font-size:20px; color:#0f172a; font-weight:700; }
+        .activity-header-action { display:flex; justify-content:space-between; align-items:center; }
+        .activity-header-action a { color:#0f172a; text-decoration:none; font-size:14px; font-weight:500; }
+        .activity-header-action a:hover { color:#475569; }
+        .activity-card table { width:100%; border-collapse:collapse; }
+        .activity-card thead { background:#f8fafc; }
+        .activity-card th, .activity-card td { padding:14px 24px; text-align:left; font-size:14px; color:#334155; border-bottom:1px solid #e2e8f0; }
+        .activity-card tbody tr:hover { background:#f8fafc; }
+        .activity-card tbody tr:last-child td { border-bottom:none; }
+        .status-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:600; text-transform:uppercase; }
+        .status-badge.pending { background:#fef3c7; color:#b45309; }
+        .status-badge.confirmed { background:#dcfce7; color:#166534; }
+        .status-badge.cancelled { background:#fee2e2; color:#b91c1c; }
+        .quick-links { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-top:20px; }
+        .quick-link { background:#fff; border-radius:12px; padding:16px; border:1px solid #e2e8f0; text-align:center; cursor:pointer; transition:all 0.2s; text-decoration:none; color:#0f172a; }
+        .quick-link:hover { border-color:#0f172a; box-shadow:0 4px 16px rgba(15,23,42,0.1); }
+        .quick-link-icon { font-size:24px; margin-bottom:8px; }
+        .quick-link-text { font-weight:600; font-size:14px; }
+
+        @@media (max-width: 900px) {
+        .charts-row { grid-template-columns: 1fr; }
+        .donut-wrapper { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header">Admin Panel</div>
+    <div class="user-info">
+        <div class="user-avatar">A</div>
+        <span class="user-name">Admin</span>
+    </div>
+    <ul class="sidebar-menu">
+        <li class="active"><a href="/dash-board">Dashboard</a></li>
+        <li><a href="/booking-history">Lịch sử Booking</a></li>
+        <li><a href="/approve-application">Duyệt Yêu Cầu</a></li>
+        <li><a href="/user-management">Quản Lý Người Dùng</a></li>
+        <li><a href="/permissions-manager">Quản Lý Phân Quyền</a></li>
+        <li><a href="/feedback-management">Quản Lý Phản Hồi</a></li>
+    </ul>
+    <div class="sidebar-footer">
+        <button type="button" class="logout-btn">Đăng xuất</button>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="page-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p class="page-subtitle">Theo dõi hoạt động hệ thống và các yêu cầu gần đây.</p>
+        </div>
+    </div>
+    <main>
+        <!-- Stat Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Tổng số người dùng</div>
+                <div class="stat-value">1,240</div>
+                <div class="stat-caption">Số lượng tài khoản đã đăng ký</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Cơ sở đang hoạt động</div>
+                <div class="stat-value">85</div>
+                <div class="stat-caption">Homestay &amp; Nhà hàng hoạt động</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Doanh thu tháng</div>
+                <div class="stat-value">₫48,500,000</div>
+                <div class="stat-caption">Tổng doanh thu tháng này</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Yêu cầu đang chờ</div>
+                <div class="stat-value">12</div>
+                <div class="stat-caption">Yêu cầu duyệt cơ sở mới</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Tổng Booking</div>
+                <div class="stat-value">3,410</div>
+                <div class="stat-caption">Tất cả booking trong hệ thống</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Thanh toán chờ</div>
+                <div class="stat-value">34</div>
+                <div class="stat-caption">Booking chưa thanh toán</div>
+            </div>
+        </div>
+
+        <!-- ===================== CHARTS SECTION ===================== -->
+        <div class="charts-section">
+            <div class="charts-section-title">📊 Thống kê hệ thống</div>
+
+            <!-- Row 1: Revenue bar chart (full width) -->
+            <div class="charts-row">
+                <div class="chart-card chart-full">
+                    <div class="chart-card-header">
+                        <h3>📈 Doanh thu theo tháng</h3>
+                        <span>Năm 2025 • đơn vị: triệu ₫</span>
+                    </div>
+                    <div class="chart-card-body">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Donut + Bar side by side -->
+            <div class="charts-row">
+                <!-- Donut: Booking status -->
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h3>🔵 Tỉ lệ trạng thái Booking</h3>
+                        <span>Tháng này</span>
+                    </div>
+                    <div class="chart-card-body">
+                        <div class="donut-wrapper">
+                            <canvas id="statusDonutChart"></canvas>
+                            <div class="donut-legend">
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background:#166534;"></div>
+                                    <span class="legend-label">Đã xác nhận</span>
+                                    <span class="legend-value">1,820</span>
+                                    <span class="legend-pct">(53%)</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background:#b45309;"></div>
+                                    <span class="legend-label">Đang chờ</span>
+                                    <span class="legend-value">890</span>
+                                    <span class="legend-pct">(26%)</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background:#b91c1c;"></div>
+                                    <span class="legend-label">Đã hủy</span>
+                                    <span class="legend-value">700</span>
+                                    <span class="legend-pct">(21%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bar: Homestay vs Restaurant -->
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <h3>🏨 Booking theo loại hình</h3>
+                        <span>6 tháng gần nhất</span>
+                    </div>
+                    <div class="chart-card-body">
+                        <canvas id="typeBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- =================== END CHARTS SECTION =================== -->
+
+        <!-- Recent Booking Table -->
+        <div class="activity-card">
+            <header>
+                <div class="activity-header-action">
+                    <h2>Lịch sử Booking gần đây</h2>
+                    <a href="/BookingHistory">Xem tất cả →</a>
+                </div>
+            </header>
+            <table>
+                <thead>
+                <tr>
+                    <th>Mã Booking</th>
+                    <th>Khách hàng</th>
+                    <th>Cơ sở</th>
+                    <th>Loại hình</th>
+                    <th>Số khách</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><strong>#BK2025001</strong></td>
+                    <td>Nguyễn Văn An</td>
+                    <td>Homestay Đà Lạt Xanh</td>
+                    <td>Homestay</td>
+                    <td>3 người</td>
+                    <td>₫2,400,000</td>
+                    <td><span class="status-badge confirmed">Đã xác nhận</span></td>
+                </tr>
+                <tr>
+                    <td><strong>#BK2025002</strong></td>
+                    <td>Trần Thị Bình</td>
+                    <td>Nhà hàng Phố Cổ</td>
+                    <td>Nhà hàng</td>
+                    <td>6 người</td>
+                    <td>₫1,800,000</td>
+                    <td><span class="status-badge pending">Đang chờ</span></td>
+                </tr>
+                <tr>
+                    <td><strong>#BK2025003</strong></td>
+                    <td>Lê Minh Cường</td>
+                    <td>Homestay Hội An Garden</td>
+                    <td>Homestay</td>
+                    <td>2 người</td>
+                    <td>₫3,200,000</td>
+                    <td><span class="status-badge cancelled">Đã hủy</span></td>
+                </tr>
+                <tr>
+                    <td><strong>#BK2025004</strong></td>
+                    <td>Phạm Thu Dung</td>
+                    <td>Quán Ăn Bà Ngoại</td>
+                    <td>Nhà hàng</td>
+                    <td>4 người</td>
+                    <td>₫950,000</td>
+                    <td><span class="status-badge confirmed">Đã xác nhận</span></td>
+                </tr>
+                <tr>
+                    <td><strong>#BK2025005</strong></td>
+                    <td>Hoàng Quốc Việt</td>
+                    <td>Villa Sapa Mist</td>
+                    <td>Homestay</td>
+                    <td>5 người</td>
+                    <td>₫5,600,000</td>
+                    <td><span class="status-badge confirmed">Đã xác nhận</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<script>
+    Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    Chart.defaults.color = '#64748b';
+
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'bar',
+        data: {
+            labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+            datasets: [{
+                label: 'Doanh thu (triệu ₫)',
+                data: [32, 28, 41, 38, 45, 52, 48, 55, 60, 58, 62, 70],
+                backgroundColor: 'rgba(24, 144, 255, 0.15)',
+                borderColor: '#1890ff',
+                borderWidth: 2,
+                borderRadius: 6,
+                borderSkipped: false,
+                hoverBackgroundColor: 'rgba(24, 144, 255, 0.35)',
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ₫${ctx.parsed.y} triệu`
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#f1f5f9' },
+                    ticks: { callback: v => `${v}M` }
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('statusDonutChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Đã xác nhận', 'Đang chờ', 'Đã hủy'],
+            datasets: [{
+                data: [1820, 890, 700],
+                backgroundColor: ['#4ade80', '#fbbf24', '#f87171'],
+                borderColor: ['#166534', '#b45309', '#b91c1c'],
+                borderWidth: 1.5,
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '68%',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.label}: ${ctx.parsed.toLocaleString('vi-VN')} booking`
+                    }
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('typeBarChart'), {
+        type: 'bar',
+        data: {
+            labels: ['T7/24', 'T8/24', 'T9/24', 'T10/24', 'T11/24', 'T12/24'],
+            datasets: [
+                {
+                    label: 'Homestay',
+                    data: [210, 245, 198, 260, 280, 310],
+                    backgroundColor: 'rgba(99, 179, 237, 0.25)',
+                    borderColor: '#3b82f6',
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Nhà hàng',
+                    data: [140, 160, 175, 155, 190, 220],
+                    backgroundColor: 'rgba(251, 146, 60, 0.2)',
+                    borderColor: '#f97316',
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    borderSkipped: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { boxWidth: 12, padding: 16, font: { size: 12 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y} booking`
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#f1f5f9' }
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

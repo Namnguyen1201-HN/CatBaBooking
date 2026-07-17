@@ -1,0 +1,47 @@
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác Thực OTP - Cát Bà Booking</title>
+    <link rel="stylesheet" href="~/css/Authentication/auth-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>Xác Thực OTP</h2>
+        <p>Nhập mã OTP đã gửi đến email của bạn</p>
+    </div>
+
+    <!-- <p style="color:red;">Mã OTP không đúng hoặc đã hết hạn.</p> -->
+
+    <form action="/verify-otp" method="post">
+        <input type="hidden" name="action" value="verify-otp">
+        <input type="hidden" name="email" value="">
+        <div class="form-group">
+            <label for="otp">Mã OTP</label>
+            <div class="input-wrapper">
+                <i class="fas fa-key"></i>
+                <input type="text" id="otp" name="otp" placeholder="Nhập mã OTP (6 chữ số)" required maxlength="6">
+            </div>
+        </div>
+        <button type="submit" class="submit-btn">Xác Thực</button>
+    </form>
+    @if (ViewBag.Error != null)
+    {
+        <div style="background-color: #fef2f2; border: 1px solid #fee2e2; color: #dc2626; padding: 12px; borderRadius: 8px; font-size: 14px; margin-bottom: 16px; display: flex; align-items: center;">
+            <i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i>
+            <span>@ViewBag.Error</span>
+        </div>
+    }
+    <div class="link">
+        Quay lại <a href="/forgot-password">Gửi lại OTP</a>
+    </div>
+</div>
+</body>
+</html>

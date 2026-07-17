@@ -1,0 +1,231 @@
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Quản Lý Người Dùng</title>
+    <link rel="stylesheet" href="~/css/Admin/admin-style.css">
+    <style>
+        .btn-back {
+            background-color: #d9d9d9;
+            color: #333;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-back:hover { background-color: #bfbfbf; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">Admin Panel</div>
+        <div class="user-info">
+            <div class="user-avatar">A</div>
+            <span class="user-name">Admin</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/dash-board">Dashboard</a></li>
+            <li><a href="/booking-history">Lịch sử Booking</a></li>
+            <li><a href="/approve-application">Duyệt Yêu Cầu</a></li>
+            <li class="active"><a href="/user-management">Quản Lý Người Dùng</a></li>
+            <li><a href="/permissions-manager">Quản Lý Phân Quyền</a></li>
+            <li><a href="/feedback-management">Quản Lý Phản Hồi</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button type="button" class="logout-btn">Đăng xuất</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <main>
+            <!-- ===== LIST VIEW ===== -->
+            <div id="listView" style="display:block;">
+                <div class="search-container">
+                    <input type="text" placeholder="Tìm kiếm">
+                    <select>
+                        <option value="">Tất cả quyền</option>
+                        <option>Customer</option>
+                        <option>Owner Homestay</option>
+                        <option>Owner Restaurant</option>
+                    </select>
+                    <select>
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="active">Hoạt động</option>
+                        <option value="rejected">Không hoạt động</option>
+                    </select>
+                    <button type="button">Tìm kiếm</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Họ Tên</th>
+                            <th>Email</th>
+                            <th>Quyền</th>
+                            <th>Trạng Thái</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Nguyễn Văn An</td>
+                            <td>an.nguyen@email.com</td>
+                            <td>Customer</td>
+                            <td><span class="status-active">Hoạt động</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a class="btn btn-view" href="#" onclick="showDetail('Nguyễn Văn An','an.nguyen@email.com','0901234567','001099000001','12 Nguyễn Huệ Q1 TP.HCM','Customer','active',false); return false;">Chi tiết</a>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="toggle1" checked onchange="toggleConfirm(this)">
+                                        <label for="toggle1"></label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Trần Thị Bình</td>
+                            <td>binh.tran@email.com</td>
+                            <td>Owner Homestay</td>
+                            <td><span class="status-active">Hoạt động</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a class="btn btn-view" href="#" onclick="showDetail('Trần Thị Bình','binh.tran@email.com','0912345678','001099000002','45 Trần Phú Đà Lạt','Owner Homestay','active',true); return false;">Chi tiết</a>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="toggle2" checked onchange="toggleConfirm(this)">
+                                        <label for="toggle2"></label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Lê Minh Cường</td>
+                            <td>cuong.le@email.com</td>
+                            <td>Customer</td>
+                            <td><span class="status-pending">Chờ duyệt</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a class="btn btn-view" href="#" onclick="showDetail('Lê Minh Cường','cuong.le@email.com','0923456789','001099000003','78 Lê Lợi TP.HCM','Customer','pending',false); return false;">Chi tiết</a>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="toggle3" onchange="toggleConfirm(this)">
+                                        <label for="toggle3"></label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Phạm Thu Dung</td>
+                            <td>dung.pham@email.com</td>
+                            <td>Owner Restaurant</td>
+                            <td><span class="status-rejected">Không hoạt động</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a class="btn btn-view" href="#" onclick="showDetail('Phạm Thu Dung','dung.pham@email.com','0934567890','001099000004','18 Lê Lợi TP.HCM','Owner Restaurant','rejected',true); return false;">Chi tiết</a>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="toggle4" onchange="toggleConfirm(this)">
+                                        <label for="toggle4"></label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Hoàng Quốc Việt</td>
+                            <td>viet.hoang@email.com</td>
+                            <td>Customer</td>
+                            <td><span class="status-active">Hoạt động</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a class="btn btn-view" href="#" onclick="showDetail('Hoàng Quốc Việt','viet.hoang@email.com','0945678901','001099000005','Sapa Lào Cai','Customer','active',false); return false;">Chi tiết</a>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="toggle5" checked onchange="toggleConfirm(this)">
+                                        <label for="toggle5"></label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagger">
+                    <span style="color:#999;">« Trước</span>
+                    <span style="background:#007bff; color:#fff; border:1px solid #007bff; padding:8px 14px; border-radius:4px;">1</span>
+                    <a href="#">2</a>
+                    <a href="#">3</a>
+                    <a href="#">Sau »</a>
+                </div>
+            </div>
+
+            <!-- ===== DETAIL VIEW ===== -->
+            <div id="detailView" class="detail-view">
+                <h3>THÔNG TIN CHI TIẾT NGƯỜI DÙNG</h3>
+                <div class="detail-content">
+                    <div class="detail-column">
+                        <h4>THÔNG TIN CÁ NHÂN</h4>
+                        <div class="detail-item"><strong>Họ và tên:</strong> <span id="d-name"></span></div>
+                        <div class="detail-item"><strong>Email:</strong> <span id="d-email"></span></div>
+                        <div class="detail-item"><strong>Số điện thoại:</strong> <span id="d-phone"></span></div>
+                        <div class="detail-item"><strong>Số CCCD:</strong> <span id="d-cccd"></span></div>
+                        <div class="detail-item"><strong>Địa chỉ cá nhân:</strong> <span id="d-addr"></span></div>
+                        <div class="detail-item"><strong>Quyền:</strong> <span id="d-role"></span></div>
+                        <div class="detail-item"><strong>Trạng thái:</strong> <span id="d-status"></span></div>
+                    </div>
+                    <div class="detail-column" id="bizCol" style="display:none;">
+                        <h4>THÔNG TIN CƠ SỞ KINH DOANH</h4>
+                        <div class="detail-item"><strong>Tên cơ sở:</strong> Homestay Đà Lạt Xanh</div>
+                        <div class="detail-item"><strong>Loại hình:</strong> Homestay</div>
+                        <div class="detail-item"><strong>Địa chỉ kinh doanh:</strong> 45 Trần Phú, Đà Lạt</div>
+                        <div class="detail-item"><strong>Mô tả:</strong> Homestay view núi, không gian xanh mát.</div>
+                        <div class="detail-item"><strong>Thời gian:</strong> 07:00 - 22:00</div>
+                        <div class="detail-item"><strong>Trạng thái kinh doanh:</strong> active</div>
+                    </div>
+                </div>
+                <div style="text-align:center;">
+                    <a href="#" class="btn-back" onclick="hideDetail(); return false;">↩️ Quay lại danh sách</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function showDetail(name, email, phone, cccd, addr, role, status, hasBiz) {
+            document.getElementById('listView').style.display = 'none';
+            document.getElementById('detailView').style.display = 'block';
+            document.getElementById('d-name').textContent = name;
+            document.getElementById('d-email').textContent = email;
+            document.getElementById('d-phone').textContent = phone;
+            document.getElementById('d-cccd').textContent = cccd;
+            document.getElementById('d-addr').textContent = addr;
+            document.getElementById('d-role').textContent = role;
+            const statusMap = { active: 'Hoạt động', pending: 'Chờ duyệt', rejected: 'Không hoạt động' };
+            const colorMap = { active: 'status-active', pending: 'status-pending', rejected: 'status-rejected' };
+            const el = document.getElementById('d-status');
+            el.textContent = statusMap[status] || status;
+            el.className = colorMap[status] || '';
+            document.getElementById('bizCol').style.display = hasBiz ? 'block' : 'none';
+        }
+        function hideDetail() {
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('listView').style.display = 'block';
+        }
+        function toggleConfirm(checkbox) {
+            var newStatus = checkbox.checked ? 'active' : 'rejected';
+            if (!confirm('Xác nhận thay đổi trạng thái sang ' + newStatus + '?')) {
+                checkbox.checked = !checkbox.checked;
+            }
+        }
+    </script>
+</body>
+</html>

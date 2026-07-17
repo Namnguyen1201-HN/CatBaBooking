@@ -1,21 +1,11 @@
 using CatBaBooking.Models;
-using CatBaBooking.Repositories.Interfaces;
+using CatBaBooking.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 
-namespace CatBaBooking.Repositories.Implementations;
+namespace CatBaBooking.Repository;
 
-/// <summary>
-/// Triển khai IUserRepository dùng EF Core + CatbabookingContext.
-/// 
-/// [HƯỚNG DẪN] Các bước implement một method:
-///   1. Nhận _context từ constructor (đã inject sẵn)
-///   2. Dùng LINQ / EF Core để truy vấn DB
-///   3. Trả về kết quả (entity hoặc null)
-///   Ví dụ: return await _context.Users.FindAsync(userId);
-/// </summary>
 public class UserRepository : IUserRepository
 {
-    // _context là "cổng vào" database — được inject qua DI (xem Program.cs)
     private readonly CatbabookingContext _context;
 
     public UserRepository(CatbabookingContext context)
@@ -23,51 +13,39 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
-    public Task<User?> GetByIdAsync(int userId)
+    public User? GetByEmail(string email)
     {
-        // TODO: return await _context.Users.FindAsync(userId);
-        throw new NotImplementedException();
+        return _context.Users.Include(x => x.Role).FirstOrDefault(x => x.Email == email);
     }
 
-    public Task<User?> GetByEmailAsync(string email)
+    public User? GetActiveUserByEmail(string email)
     {
-        // TODO: return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        throw new NotImplementedException();
+        return _context.Users.FirstOrDefault(x => x.Email == email && x.Status == "active");
     }
 
-    public Task<IEnumerable<User>> GetAllAsync()
+    public bool AnyEmail(string email)
     {
-        // TODO: return (IEnumerable<User>) await _context.Users.Include(u => u.Role).ToListAsync();
-        throw new NotImplementedException();
+        return _context.Users.Any(x => x.Email == email);
     }
 
-    public Task<bool> EmailExistsAsync(string email)
+    public User AddUser(User user)
     {
-        // TODO: return await _context.Users.AnyAsync(u => u.Email == email);
-        throw new NotImplementedException();
+        _context.Users.Add(user);
+        _context.SaveChanges();
+        return user;
     }
 
-    public Task<User> CreateAsync(User user)
+    public void UpdateUser(User user)
     {
-        // TODO: _context.Users.Add(user); await _context.SaveChangesAsync(); return user;
-        throw new NotImplementedException();
+        _context.Users.Update(user);
+        _context.SaveChanges();
     }
 
-    public Task UpdateAsync(User user)
-    {
-        // TODO: _context.Users.Update(user); await _context.SaveChangesAsync();
-        throw new NotImplementedException();
-    }
-
-    public Task UpdateStatusAsync(int userId, string status)
-    {
-        // TODO: Tìm user theo id, đổi Status, rồi SaveChanges
-        throw new NotImplementedException();
-    }
-
-    public Task UpdatePasswordAsync(int userId, string hashedPassword)
-    {
-        // TODO: Tìm user, đổi Password = hashedPassword, SaveChanges
-        throw new NotImplementedException();
-    }
+    // public List<User> GetAllUser(User user)
+    // {
+    //     
+    //     return _context.Users.AsNoTracking()
+    //         .Include(x => x.Role)
+    //         .Where(u => u.RoleId != 3).AsQueryable();
+    // }
 }

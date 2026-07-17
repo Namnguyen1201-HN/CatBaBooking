@@ -36,4 +36,21 @@ public partial class User
     public virtual Role Role { get; set; } = null!;
 
     public virtual ICollection<TempCart> TempCarts { get; set; } = new List<TempCart>();
+
+    public User(int userId, int roleId, string fullName, string email, string passwordHash,
+    string? phone, string? citizenId, string? personalAddress, string status,
+    DateTime? createdAt, DateTime? updatedAt)
+    {
+        UserId = userId;
+        RoleId = roleId;
+        FullName = fullName;
+        Email = email;
+        PasswordHash = passwordHash;
+        Phone = phone;
+        CitizenId = citizenId;
+        PersonalAddress = personalAddress;
+        Status = status;
+        CreatedAt = createdAt;
+        UpdatedAt = updatedAt;
+    }
 }

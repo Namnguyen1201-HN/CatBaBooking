@@ -66,4 +66,18 @@ public partial class Business
     public virtual ICollection<Occasion> Occasions { get; set; } = new List<Occasion>();
 
     public virtual ICollection<RestaurantType> Types { get; set; } = new List<RestaurantType>();
+    public Business() { }
+    public Business(int businessId, int ownerId, string name, string type, string address,
+    string description, string status, DateTime? createdAt, DateTime? updatedAt)
+    {
+        BusinessId = businessId;
+        OwnerId = ownerId;
+        Name = name;
+        Type = type;
+        Address = address;
+        Description = description;
+        Status = status;
+        CreatedAt = createdAt;
+        UpdatedAt = updatedAt;
+    }
 }
