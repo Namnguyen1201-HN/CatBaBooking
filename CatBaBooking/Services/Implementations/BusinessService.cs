@@ -101,4 +101,40 @@ public class BusinessService : IBusinessService
         // TODO: _businessRepository.UpdateStatusAsync(businessId, status);
         throw new NotImplementedException();
     }
+
+    public async Task<IEnumerable<HomestayCardViewModel>> GetFeaturedHomestaysAsync(int top = 3) // NamNS
+    {
+        //1. take raw data
+        var business = await _businessRepository.GetFeaturedHomestaysAsync(top);
+        //2. Map entitu -> ViewModel
+        return business.Select(b => new HomestayCardViewModel
+        {
+            BusinessId = b.BusinessId,
+            Name = b.Name,
+            ThumbnailUrl = b.Image,
+            Address = b.Address,
+            AreaName = b.Area?.Name,                    //area maybe null
+            PriceFrom = b.PricePerNight ?? 0,
+            AverageRating = (double)(b.AvgRating ?? 0),
+            ReviewCount = b.ReviewCount ?? 0
+        });
+    }
+
+    public async Task<IEnumerable<RestaurantCardViewModel>> GetFeaturedRestaurantAsync(int top = 3)
+    {
+        var business = await _businessRepository.GetFeaturedRestaurantAsync(top);
+        return business.Select(b => new RestaurantCardViewModel
+        {
+            BusinessId = b.BusinessId,
+            Name = b.Name,
+            ThumbnailUrl = b.Image,
+            Address = b.Address,
+            AreaName = b.Area?.Name,
+            AverageRating = (double)(b.AvgRating ?? 0),
+            ReviewCount = b.ReviewCount ?? 0,
+            OpeningTime = b.OpeningHour?.ToString(@"HH:mm"),
+            ClosingTime = b.ClosingHour?.ToString(@"HH:mm"),
+        });
+    }
+
 }

@@ -1,4 +1,5 @@
 
+using CatBaBooking.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -7,10 +8,12 @@ namespace CatBaBooking.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IBusinessService _businessService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IBusinessService businessService)
         {
             _logger = logger;
+            _businessService = businessService;
         }
 
         public IActionResult Index()
@@ -25,8 +28,13 @@ namespace CatBaBooking.Controllers
 
         [Route("")]
         [Route("home-page")]
-        public IActionResult HomePage()
+        public async Task<IActionResult> HomePage()
         {
+            var featuredHomestays = await _businessService.GetFeaturedHomestaysAsync(top: 3);
+            var featuredRestaurant = await _businessService.GetFeaturedRestaurantAsync(top: 3);
+
+            ViewBag.FeaturedHomestays = featuredHomestays;
+            ViewBag.FeaturedRestaurants = featuredRestaurant;
             return View();
         }
 

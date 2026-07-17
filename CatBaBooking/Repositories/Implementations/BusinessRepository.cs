@@ -1,5 +1,6 @@
 using CatBaBooking.Models;
 using CatBaBooking.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace CatBaBooking.Repositories.Implementations;
 
@@ -89,5 +90,27 @@ public class BusinessRepository : IBusinessRepository
     {
         // TODO: Tìm business, Remove, SaveChanges
         throw new NotImplementedException();
+    }
+
+    public async Task<IEnumerable<Business>> GetFeaturedHomestaysAsync(int top) //NamNS
+    {
+        return await _context.Businesses
+                    .Where(b => b.Type == "homestay" && b.Status == "active")
+                    .OrderByDescending(b => b.AvgRating)
+                    .ThenByDescending(b => b.ReviewCount)
+                    .Take(top)
+                    .Include(b => b.Area)
+                    .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Business>> GetFeaturedRestaurantAsync(int top) //NamNS
+    {
+        return await _context.Businesses
+                    .Where(b => b.Type == "restaurant" && b.Status == "active")
+                    .OrderByDescending(b => b.AvgRating)
+                    .ThenByDescending(b => b.ReviewCount)
+                    .Take(top)
+                    .Include(b => b.Area)
+                    .ToListAsync();
     }
 }

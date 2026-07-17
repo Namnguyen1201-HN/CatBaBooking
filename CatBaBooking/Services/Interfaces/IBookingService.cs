@@ -41,4 +41,5 @@ public interface IBookingService
     /// Owner xác nhận hoặc từ chối booking.
     /// </summary>
     Task<bool> UpdateBookingStatusAsync(int bookingId, string status, int ownerId);
+
 }

@@ -34,6 +34,12 @@ public interface IBusinessRepository
     /// <summary>Đếm tổng số restaurant.</summary>
     Task<int> CountRestaurantsAsync();
 
+    /// <summary>NamNS - Lấy top N homestay nôi bật (sắp xếp theo AvgRating)</summary>
+    Task<IEnumerable<Business>> GetFeaturedHomestaysAsync(int n);
+
+    /// <summary>NamNS - Lấy top N restaurant nôi bật (sắp xếp theo AvgRating)</summary>
+    Task<IEnumerable<Business>> GetFeaturedRestaurantAsync(int n);
+
     // ── CREATE ────────────────────────────────────────────────────────────────
 
     /// <summary>Thêm business mới (Owner đăng ký listing mới).</summary>

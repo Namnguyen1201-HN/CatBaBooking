@@ -27,6 +27,12 @@ public interface IBusinessService
     /// <summary>Lấy chi tiết restaurant, gồm tables, dishes và reviews.</summary>
     Task<RestaurantDetailViewModel?> GetRestaurantDetailAsync(int businessId);
 
+    /// <summary>NamNS - Lấy top homestay nổi bật cho trang HomePage.</summary>>
+    Task<IEnumerable<HomestayCardViewModel>> GetFeaturedHomestaysAsync(int top = 3);
+
+    /// <summary>NamNS - Lấy top restaurant nổi bật cho trang HomePage.</summary>>
+    Task<IEnumerable<RestaurantCardViewModel>> GetFeaturedRestaurantAsync(int top = 3);
+
     // ── OWNER (Manage Listings) ────────────────────────────────────────────────
 
     /// <summary>Lấy danh sách business của một Owner.</summary>

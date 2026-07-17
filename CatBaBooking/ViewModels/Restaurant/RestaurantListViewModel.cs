@@ -5,6 +5,7 @@ public class RestaurantCardViewModel
 {
     public int BusinessId { get; set; }
     public string Name { get; set; } = "";
+    public string? AreaName { get; set; }
     public string? ThumbnailUrl { get; set; }
     public string? Address { get; set; }
     public string? CuisineType { get; set; }
