@@ -1,4 +1,4 @@
-
+@model CatBaBooking.ViewModels.Homestay.HomestayDetailViewModel
 @{
 Layout = null;
 }
@@ -68,117 +68,133 @@ Layout = null;
     </div>
 </div>
 
-<section class="detail-hero">
-    <div class="container">
-        <div class="gallery-layout">
-            <div class="main-photo">
-                <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=500&fit=crop" alt="Homestay Ocean View Cát Bà">
-            </div>
-            <div class="side-photos">
-                <div class="side-photo"><img src="https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=400&h=240&fit=crop" alt="Ảnh phụ 1"></div>
-                <div class="side-photo"><img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=240&fit=crop" alt="Ảnh phụ 2"></div>
-            </div>
-        </div>
-        <div class="stay-header">
-            <div class="stay-info">
-                <div class="stay-name">
-                    <h1>Homestay Ocean View Cát Bà</h1>
-                    <span class="badge-type"><i class="fa-solid fa-leaf"></i> Homestay</span>
+    <section class="detail-hero">
+        <div class="container">
+            <div class="gallery-layout">
+                <div class="main-photo">
+                    
+                    <img src="@(Model.ThumbnailUrl ?? "/images/default-homestay.jpg")" alt="@Model.Name">
                 </div>
-                <div class="rating-row">
-                    <div class="rating-score">4.5</div>
-                    <div class="rating-details">
-                        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-alt"></i></div>
-                        <span>Tuyệt vời</span><span>• 128 đánh giá</span>
+                
+                <div class="side-photos">
+                    <div class="side-photo"><img src="https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=400&h=240&fit=crop" alt="Ảnh phụ 1"></div>
+                    <div class="side-photo"><img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=240&fit=crop" alt="Ảnh phụ 2"></div>
+                </div>
+            </div>
+            <div class="stay-header">
+                <div class="stay-info">
+                    <div class="stay-name">
+                        <h1>@Model.Name</h1> 
+                        <span class="badge-type"><i class="fa-solid fa-leaf"></i> Homestay</span>
                     </div>
+                    <div class="rating-row">
+                        <div class="rating-score">@Model.AverageRating.ToString("0.0")</div> 
+                        <div class="rating-details">
+                            <div class="stars">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Math.Floor(Model.AverageRating))
+                                    {
+                                        <i class="fa-solid fa-star"></i>
+                                    }
+                                    else if (i - Model.AverageRating < 1 && i - Model.AverageRating > 0)
+                                    {
+
+                                        <i class="fa-solid fa-star-half-alt"></i>
+                                    }
+                                    else
+                                    {
+
+                                        <i class="fa-regular fa-star"></i>
+                                    }
+                                }
+                            </div>
+                            <span>• @Model.ReviewCount đánh giá</span>
+                        </div>
+                    </div>
+                    <div class="stay-location"><i class="fa-solid fa-location-dot"></i><span>@(Model.AreaName ?? Model.Address)</span></div>
                 </div>
-                <div class="stay-location"><i class="fa-solid fa-location-dot"></i><span>Cát Cò 1, Cát Bà, Hải Phòng</span></div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
 <section class="detail-content">
     <div class="detail-layout">
-        <div class="left-col">
-            <div class="section-card" id="description">
-                <div class="section-title"><i class="fa-solid fa-circle-info"></i> <span>Mô tả chỗ nghỉ</span></div>
-                <div class="desc-text">Homestay Ocean View nằm ngay bãi Cát Cò 1, với tầm nhìn tuyệt đẹp ra biển Cát Bà. Không gian yên tĩnh, sạch sẽ, phù hợp cho cặp đôi và gia đình nhỏ. Chủ nhà thân thiện, nhiệt tình hướng dẫn các địa điểm tham quan đẹp tại Cát Bà.</div>
-            </div>
 
-            <div class="section-card" id="amenities">
-                <div class="section-title"><i class="fa-solid fa-screwdriver-wrench"></i> <span>Tiện nghi nổi bật</span></div>
-                <div class="amenities-list">
-                    <div class="amenity-pill"><i class="fa-solid fa-wifi"></i><span>WiFi miễn phí</span></div>
-                    <div class="amenity-pill"><i class="fa-solid fa-mug-hot"></i><span>Bữa sáng</span></div>
-                    <div class="amenity-pill"><i class="fa-solid fa-car"></i><span>Bãi đỗ xe</span></div>
-                    <div class="amenity-pill"><i class="fa-solid fa-snowflake"></i><span>Điều hòa</span></div>
-                    <div class="amenity-pill"><i class="fa-solid fa-tv"></i><span>TV</span></div>
+            <div class="left-col">
+                <div class="section-card" id="description">
+                    <div class="section-title"><i class="fa-solid fa-circle-info"></i> <span>Mô tả chỗ nghỉ</span></div>
+                    <div class="desc-text">@Model.Description</div>
                 </div>
-            </div>
-
-            <div class="section-card" id="rooms">
-                <div class="section-title"><i class="fa-solid fa-bed"></i> <span>Phòng còn trống</span></div>
-                <div class="room-card">
-                    <div class="room-img"><img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=300&h=200&fit=crop" alt="Phòng Deluxe Biển"></div>
-                    <div class="room-body">
-                        <div class="room-top">
-                            <div class="room-info">
-                                <h3>Phòng Deluxe View Biển</h3>
-                                <div class="room-meta">
-                                    <span><i class="fa-solid fa-user-group"></i> 2 khách</span>
-                                    <span><i class="fa-solid fa-bed"></i> 1 giường đôi</span>
-                                    <span><i class="fa-solid fa-wifi"></i> WiFi</span>
+                <div class="section-card" id="amenities">
+                    <div class="section-title"><i class="fa-solid fa-screwdriver-wrench"></i> <span>Tiện nghi nổi bật</span></div>
+                    <div class="amenities-list">
+                        @foreach (var amenity in Model.Amenities)
+                        {
+                            <div class="amenity-pill"><i class="fa-solid fa-check"></i><span>@amenity</span></div>
+                        }
+                    </div>
+                </div>
+                <div class="section-card" id="rooms">
+                    <div class="section-title"><i class="fa-solid fa-bed"></i> <span>Phòng còn trống</span></div>
+                    @if (!Model.Rooms.Any())
+                    {
+                        <p>Hiện chưa có phòng nào.</p>
+                    }
+                    @foreach (var room in Model.Rooms)
+                    {
+                        <div class="room-card" style="margin-top:16px;">
+                            <div class="room-img"><img src="/images/default-room.jpg" alt="@room.RoomName"></div>
+                            <div class="room-body">
+                                <div class="room-top">
+                                    <div class="room-info">
+                                        <h3>@room.RoomName</h3>
+                                        <div class="room-meta">
+                                            <span><i class="fa-solid fa-user-group"></i> @room.Capacity khách</span>
+                                        </div>
+                                    </div>
+                                    <div class="room-price"><div class="current-price">@room.PricePerNight.ToString("N0")đ</div></div>
+                                </div>
+                                <div class="room-bottom">
+                                    @if (room.IsAvailable)
+                                    {
+                                        <div class="availability-tag"><i class="fa-solid fa-circle-check"></i> <span>Còn trống</span></div>
+                                        <button class="book-btn" onclick="bookRoom(@room.RoomId)">Đặt phòng này</button>
+                                    }
+                                    else
+                                    {
+                                        <div class="availability-tag" style="color:red;"><i class="fa-solid fa-circle-xmark"></i> <span>Đã hết</span></div>
+                                        <button class="book-btn" disabled style="background-color:gray;">Hết phòng</button>
+                                    }
                                 </div>
                             </div>
-                            <div class="room-price"><div class="current-price">850,000đ</div></div>
                         </div>
-                        <div class="room-bottom">
-                            <div class="availability-tag"><i class="fa-solid fa-circle-check"></i> <span>Còn trống</span></div>
-                            <button class="book-btn" onclick="bookRoom(1)">Đặt phòng này</button>
+                    }
+                </div>
+                <!-- Chính sách giữ nguyên -->
+                <div class="section-card" id="policy">
+                    <div class="section-title"><i class="fa-solid fa-file-shield"></i> <span>Chính sách lưu trú</span></div>
+                    <div class="desc-text" style="font-size:.875rem;">
+                        - Nhận phòng: sau 14:00<br>- Trả phòng: trước 12:00<br>- Hủy miễn phí trước 3 ngày<br>- Không hút thuốc trong phòng
+                    </div>
+                </div>
+                <div class="section-card" id="reviews">
+                    <div class="section-title"><i class="fa-solid fa-comments"></i> <span>Đánh giá từ khách</span></div>
+                    <div class="review-summary">
+                        <div class="review-score-box"><div class="big">@Model.AverageRating.ToString("0.0")</div></div>
+                        <div class="review-text">
+                            @if (!Model.RecentReviews.Any())
+                            {
+                                <p>Chưa có đánh giá nào.</p>
+                            }
+                            @foreach (var review in Model.RecentReviews)
+                            {
+                                <p>"@review.Comment"<br><br>— @review.UserName, @review.CreatedAt.ToString("dd/MM/yyyy")</p>
+                            }
                         </div>
                     </div>
                 </div>
-                <div class="room-card" style="margin-top:16px;">
-                    <div class="room-img"><img src="https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=300&h=200&fit=crop" alt="Phòng Standard"></div>
-                    <div class="room-body">
-                        <div class="room-top">
-                            <div class="room-info">
-                                <h3>Phòng Standard</h3>
-                                <div class="room-meta">
-                                    <span><i class="fa-solid fa-user-group"></i> 3 khách</span>
-                                    <span><i class="fa-solid fa-bed"></i> 2 giường đơn</span>
-                                    <span><i class="fa-solid fa-wifi"></i> WiFi</span>
-                                </div>
-                            </div>
-                            <div class="room-price"><div class="current-price">650,000đ</div></div>
-                        </div>
-                        <div class="room-bottom">
-                            <div class="availability-tag"><i class="fa-solid fa-circle-check"></i> <span>Còn trống</span></div>
-                            <button class="book-btn" onclick="bookRoom(2)">Đặt phòng này</button>
-                        </div>
-                    </div>
-                </div>
             </div>
-
-            <div class="section-card" id="policy">
-                <div class="section-title"><i class="fa-solid fa-file-shield"></i> <span>Chính sách lưu trú</span></div>
-                <div class="desc-text" style="font-size:.875rem;">
-                    - Nhận phòng: sau 14:00<br>- Trả phòng: trước 12:00<br>- Hủy miễn phí trước 3 ngày<br>- Không hút thuốc trong phòng
-                </div>
-            </div>
-
-            <div class="section-card" id="reviews">
-                <div class="section-title"><i class="fa-solid fa-comments"></i> <span>Đánh giá từ khách</span></div>
-                <div class="review-summary">
-                    <div class="review-score-box"><div class="big">4.5</div><div style="font-size:.75rem;">Tuyệt vời</div></div>
-                    <div class="review-text">
-                        <p>"Phòng sạch sẽ, view biển đẹp tuyệt vời. Chủ nhà rất nhiệt tình và thân thiện."<br><br>— Trần Thị B, 15/05/2025</p>
-                        <p>"Giá cả hợp lý, vị trí thuận tiện, sẽ quay lại lần sau!"<br><br>— Lê Văn C, 02/06/2025</p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="right-col">
             <div class="section-card map-card" id="map">

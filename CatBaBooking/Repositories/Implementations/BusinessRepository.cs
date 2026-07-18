@@ -117,4 +117,79 @@ public class BusinessRepository : IBusinessRepository
                     .Include(b => b.Area)
                     .ToListAsync();
     }
+
+    public List<Business> GetFeaturedHomestays(int count) //NamNS
+    {
+        return _context.Businesses
+            .Include(b => b.Area)
+            .Include(b => b.Rooms)
+            .Where(b => b.Type == "Homestay")
+            .OrderByDescending(b => b.AvgRating)
+            .Take(count)
+            .ToList();
+    }
+
+    public List<Business> GetFeaturedRestaurants(int count) //NamNS
+    {
+        return _context.Businesses
+            .Include(b => b.Area)
+            .Where(b => b.Type == "Restaurant")
+            .OrderByDescending(b => b.AvgRating)
+            .Take(count)
+            .ToList(); 
+    }
+
+    public List<Business> GetHomestays(int page, int pageSize, out int totalCount) //NamNS
+    {
+        var query = _context.Businesses
+            .Include(b => b.Area)
+            .Include(b => b.Rooms)
+            .Where(b => b.Type == "Homestay" && b.Status == "active"); 
+
+            totalCount = query.Count();
+  
+        return query
+            .OrderByDescending(b => b.AvgRating)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    public List<Business> GetRestaurants(int page, int pageSize, out int totalCount) //NamNS
+    {
+        var query = _context.Businesses
+            .Include(b => b.Area)
+            .Where(b => b.Type == "Restaurant" && b.Status == "active");
+
+        totalCount = query.Count();
+        return query
+            .OrderByDescending(b => b.AvgRating)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    public Business GetHomestayDetail(int businessId) //NamNS
+    {
+        return _context.Businesses
+            .Include(b => b.Area)
+            .Include(b => b.Rooms)
+            .Include(b => b.Amenities)
+            .Include(b => b.Reviews)
+            .ThenInclude(r => r.User) 
+            .FirstOrDefault(b => b.BusinessId == businessId && b.Type == "homestay");
+    }
+
+    public Business GetRestaurantDetail(int businessId) //NamNS
+    {
+        return _context.Businesses
+            .Include(b => b.Area)
+            .Include(b => b.RestaurantTables) 
+            .Include(b => b.DishCategories) 
+            .Include(b => b.Dishes)         
+            .Include(b => b.Reviews)
+            .ThenInclude(r => r.User)
+            .FirstOrDefault(b => b.BusinessId == businessId && b.Type == "Restaurant");
+    }
+
 }
