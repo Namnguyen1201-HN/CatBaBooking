@@ -1,8 +1,8 @@
-
-
 @{
     Layout = null;
 }
+@model CatBaBooking.ViewModels.Restaurant.RestaurantDetailViewModel
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -37,31 +37,43 @@
             <section class="left-side">
                 <div class="restaurant-header-card">
                     <div class="restaurant-cover">
-                        <img src="https://images.unsplash.com/photo-1514190051997-0f6f39ca5cde?w=900&h=400&fit=crop" alt="Nhà hàng Hải Sản Cát Bà">
+                        <img src="@(Model.ThumbnailUrl ?? "/images/default-restaurant.jpg")" alt="@Model.Name">
                     </div>
                     <div class="restaurant-main-info">
                         <div class="restaurant-top-row">
                             <div class="restaurant-name-rating">
-                                <h1>Nhà hàng Hải Sản Cát Bà</h1>
+                                <h1>@Model.Name</h1>
                                 <div class="rating-line">
-                                    <span class="score">4.5 /5</span>
-                                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
-                                    <span class="reviews-count">(215 đánh giá)</span>
+                                    <span class="score">@Model.AverageRating.ToString("0.0") /5</span>
+                                    <div class="stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= Math.Floor(Model.AverageRating))
+                                            {
+                                                <i class="fas fa-star"></i>
+                                            }
+                                            else if (i - Model.AverageRating < 1 && i - Model.AverageRating > 0)
+                                            {
+
+                                                <i class="fas fa-star-half-alt"></i>
+                                            }
+                                            else
+                                            {
+
+                                                <i class="far fa-star"></i>
+                                            }
+                                        }
+                                    </div>
+                                    <span class="reviews-count">(@Model.ReviewCount đánh giá)</span>
                                 </div>
                             </div>
                             <div class="restaurant-meta">
-                                <div class="restaurant-meta-row"><i class="fas fa-map-marker-alt"></i><span>Cát Cò 1, Hải Phòng</span></div>
-                                <div class="restaurant-meta-row"><i class="fas fa-users"></i><span>Sức chứa: 150 khách</span></div>
-                                <div class="restaurant-meta-row"><i class="far fa-clock"></i><span>Giờ mở cửa: 08:00 - 22:00</span></div>
-                                <div class="restaurant-meta-row"><i class="fas fa-phone"></i><span>028 3456 7899</span></div>
+                                <div class="restaurant-meta-row"><i class="fas fa-map-marker-alt"></i><span>@(Model.Address ?? "Trung tâm Cát Bà")</span></div>
+                                <div class="restaurant-meta-row"><i class="far fa-clock"></i><span>Giờ mở cửa: @Model.OpeningTime - @Model.ClosingTime</span></div>
+                                <div class="restaurant-meta-row"><i class="fas fa-phone"></i><span>@Model.Phone</span></div>
                             </div>
                         </div>
-                        <div class="restaurant-desc">Nhà hàng chuyên các món hải sản tươi ngon từ vịnh Lan Hạ. Không gian thoáng mát, phục vụ tận tình. Đặc biệt nổi tiếng với các món tôm hùm, cua biển và cá song.</div>
-                        <div class="restaurant-tags">
-                            <span class="tag-pill">Hải sản</span>
-                            <span class="tag-pill">Đặc sản biển</span>
-                            <span class="tag-pill">View đẹp</span>
-                        </div>
+                        <div class="restaurant-desc">@Model.Description</div>
                     </div>
                 </div>
 
@@ -78,48 +90,41 @@
                     </div>
 
                     <div class="menu-list">
-                        <div class="dish-card" data-dish-name="Tôm Hùm Nướng Muối Ớt" data-dish-price="450000" data-dish-category="Hải sản" data-dish-availability="Đang bán" data-is-available="true" data-dish-id="1" data-dish-image="https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=300&h=200&fit=crop" data-dish-description="Tôm hùm tươi nướng muối ớt thơm ngon, phục vụ kèm rau sống và nước chấm đặc biệt.">
-                            <div class="dish-image"><img src="https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=300&h=200&fit=crop" alt="Tôm Hùm Nướng"></div>
-                            <div class="dish-content">
-                                <div class="dish-top-row"><div class="dish-name">Tôm Hùm Nướng Muối Ớt</div><div class="dish-price">450,000 ₫</div></div>
-                                <div class="dish-actions"><div class="availability text-success"><i class="fas fa-check-circle"></i><span>Đang bán</span></div><button class="add-btn" type="button">+ Thêm</button></div>
-                            </div>
-                        </div>
-                        <div class="dish-card" data-dish-name="Cua Biển Rang Muối" data-dish-price="350000" data-dish-category="Hải sản" data-dish-availability="Đang bán" data-is-available="true" data-dish-id="2" data-dish-image="https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=300&h=200&fit=crop" data-dish-description="Cua biển rang muối giòn ngon, thơm lừng.">
-                            <div class="dish-image"><img src="https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=300&h=200&fit=crop" alt="Cua Biển"></div>
-                            <div class="dish-content">
-                                <div class="dish-top-row"><div class="dish-name">Cua Biển Rang Muối</div><div class="dish-price">350,000 ₫</div></div>
-                                <div class="dish-actions"><div class="availability text-success"><i class="fas fa-check-circle"></i><span>Đang bán</span></div><button class="add-btn" type="button">+ Thêm</button></div>
-                            </div>
-                        </div>
-                        <div class="dish-card" data-dish-name="Cá Song Hấp Xì Dầu" data-dish-price="280000" data-dish-category="Hải sản" data-dish-availability="Đang bán" data-is-available="true" data-dish-id="3" data-dish-image="https://images.unsplash.com/photo-1559847844-5315695dadae?w=300&h=200&fit=crop" data-dish-description="Cá song tươi hấp xì dầu kiểu Hồng Kông.">
-                            <div class="dish-image"><img src="https://images.unsplash.com/photo-1559847844-5315695dadae?w=300&h=200&fit=crop" alt="Cá Song"></div>
-                            <div class="dish-content">
-                                <div class="dish-top-row"><div class="dish-name">Cá Song Hấp Xì Dầu</div><div class="dish-price">280,000 ₫</div></div>
-                                <div class="dish-actions"><div class="availability text-success"><i class="fas fa-check-circle"></i><span>Đang bán</span></div><button class="add-btn" type="button">+ Thêm</button></div>
-                            </div>
-                        </div>
-                        <div class="dish-card" data-dish-name="Mực Nướng Mỡ Hành" data-dish-price="180000" data-dish-category="Hải sản" data-dish-availability="Đang bán" data-is-available="true" data-dish-id="4" data-dish-image="https://images.unsplash.com/photo-1604909052743-94e838986d24?w=300&h=200&fit=crop" data-dish-description="Mực tươi nướng mỡ hành thơm lừng.">
-                            <div class="dish-image"><img src="https://images.unsplash.com/photo-1604909052743-94e838986d24?w=300&h=200&fit=crop" alt="Mực Nướng"></div>
-                            <div class="dish-content">
-                                <div class="dish-top-row"><div class="dish-name">Mực Nướng Mỡ Hành</div><div class="dish-price">180,000 ₫</div></div>
-                                <div class="dish-actions"><div class="availability text-success"><i class="fas fa-check-circle"></i><span>Đang bán</span></div><button class="add-btn" type="button">+ Thêm</button></div>
-                            </div>
-                        </div>
-                        <div class="dish-card" data-dish-name="Ghẹ Hấp Bia" data-dish-price="220000" data-dish-category="Hải sản" data-dish-availability="Hết món" data-is-available="false" data-dish-id="5" data-dish-image="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=300&h=200&fit=crop" data-dish-description="Ghẹ hấp bia tươi ngon.">
-                            <div class="dish-image"><img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=300&h=200&fit=crop" alt="Ghẹ Hấp"></div>
-                            <div class="dish-content">
-                                <div class="dish-top-row"><div class="dish-name">Ghẹ Hấp Bia</div><div class="dish-price">220,000 ₫</div></div>
-                                <div class="dish-actions"><div class="availability text-danger"><i class="fas fa-times-circle"></i><span>Hết món</span></div><button class="add-btn" disabled>+ Thêm</button></div>
-                            </div>
-                        </div>
-                        <div class="dish-card" data-dish-name="Canh Chua Cá" data-dish-price="95000" data-dish-category="Canh" data-dish-availability="Đang bán" data-is-available="true" data-dish-id="6" data-dish-image="https://images.unsplash.com/photo-1547592166-23ac45744acd?w=300&h=200&fit=crop" data-dish-description="Canh chua cá đặc trưng miền Nam.">
-                            <div class="dish-image"><img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?w=300&h=200&fit=crop" alt="Canh Chua"></div>
-                            <div class="dish-content">
-                                <div class="dish-top-row"><div class="dish-name">Canh Chua Cá</div><div class="dish-price">95,000 ₫</div></div>
-                                <div class="dish-actions"><div class="availability text-success"><i class="fas fa-check-circle"></i><span>Đang bán</span></div><button class="add-btn" type="button">+ Thêm</button></div>
-                            </div>
-                        </div>
+                        @if (!Model.MenuByCategory.Any())
+                        {
+                            <p>Thực đơn đang cập nhật.</p>
+                        }
+                        @foreach (var category in Model.MenuByCategory)
+                        {
+                            <h3 style="grid-column: 1 / -1; width:100%; margin-top:20px; color:#065f46;">@category.CategoryName</h3>
+
+                            @foreach (var dish in category.Dishes)
+                            {
+                                <div class="dish-card"
+                                     data-dish-name="@dish.Name"
+                                     data-dish-price="@dish.Price"
+                                     data-dish-category="@category.CategoryName"
+                                     data-dish-availability="Đang bán"
+                                     data-is-available="true"
+                                     data-dish-id="@dish.DishId"
+                                     data-dish-image="@(dish.ImageUrl ?? "/images/default-dish.jpg")"
+                                     data-dish-description="@dish.Description">
+                                    <div class="dish-image">
+                                        <img src="@(dish.ImageUrl ?? "/images/default-dish.jpg")" alt="@dish.Name">
+                                    </div>
+                                    <div class="dish-content">
+                                        <div class="dish-top-row">
+                                            <div class="dish-name">@dish.Name</div>
+                                            <div class="dish-price">@dish.Price.ToString("N0") ₫</div>
+                                        </div>
+                                        <div class="dish-actions">
+                                            <div class="availability text-success"><i class="fas fa-check-circle"></i><span>Đang bán</span></div>
+                                            <button class="add-btn" type="button">+ Thêm</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
                         <div id="noResultsMessage" class="no-dishes-message" style="display:none;"><p>Không tìm thấy món ăn nào phù hợp.</p></div>
                     </div>
                 </section>
@@ -128,22 +133,34 @@
                 <section class="reviews-section" style="margin-top:40px;padding:24px;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1);">
                     <h2 style="font-size:24px;margin-bottom:20px;color:#333;"><i class="fas fa-comments" style="margin-right:8px;"></i>Đánh giá từ khách</h2>
                     <div class="reviews-list">
-                        <div class="review-item" style="padding:16px;border-bottom:1px solid #eee;margin-bottom:16px;">
-                            <div style="display:flex;align-items:center;margin-bottom:8px;">
-                                <div style="font-weight:600;color:#333;margin-right:12px;">Trần Thị B</div>
-                                <div style="color:#ffc107;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                                <div style="margin-left:auto;color:#999;font-size:14px;">15/05/2025</div>
+                        @if (!Model.RecentReviews.Any())
+                        {
+                            <p>Chưa có đánh giá nào.</p>
+                        }
+                        @foreach (var review in Model.RecentReviews)
+                        {
+                            <div class="review-item" style="padding:16px;border-bottom:1px solid #eee;margin-bottom:16px;">
+                                <div style="display:flex;align-items:center;margin-bottom:8px;">
+                                    <div style="font-weight:600;color:#333;margin-right:12px;">@review.UserName</div>
+                                    <div style="color:#ffc107;">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= review.Rating)
+                                            {
+                                                <i class="fas fa-star"></i>
+                                            }
+                                            else
+                                            {
+
+                                                <i class="far fa-star"></i>
+                                            }
+                                        }
+                                    </div>
+                                    <div style="margin-left:auto;color:#999;font-size:14px;">@review.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                </div>
+                                <div style="color:#666;line-height:1.6;">@review.Comment</div>
                             </div>
-                            <div style="color:#666;line-height:1.6;">Tôm hùm rất tươi ngon, phục vụ nhiệt tình. Không gian đẹp nhìn ra biển.</div>
-                        </div>
-                        <div class="review-item" style="padding:16px;border-bottom:1px solid #eee;">
-                            <div style="display:flex;align-items:center;margin-bottom:8px;">
-                                <div style="font-weight:600;color:#333;margin-right:12px;">Lê Văn C</div>
-                                <div style="color:#ffc107;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div>
-                                <div style="margin-left:auto;color:#999;font-size:14px;">02/06/2025</div>
-                            </div>
-                            <div style="color:#666;line-height:1.6;">Giá cả hợp lý, đồ ăn ngon. Sẽ quay lại lần sau!</div>
-                        </div>
+                        }
                     </div>
                 </section>
             </section>

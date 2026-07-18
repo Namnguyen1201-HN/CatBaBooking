@@ -1,5 +1,5 @@
 using CatBaBooking.Models;
-using CatBaBooking.Repository.Interface;
+using CatBaBooking.Repositories.Interfaces;
 using CatBaBooking.Service.Interface.Auth;
 
 namespace CatBaBooking.Service;

@@ -43,9 +43,7 @@
             <div class="hero-text"><h1>Homestay tại Cát Bà</h1><p>Tìm và đặt homestay phù hợp với nhu cầu của bạn</p></div>
             <div class="search-forms"><div class="search-form active">
                 <div class="form-tabs">
-                    <button class="form-tab active"><i class="fas fa-home"></i><span>Homestay</span></button>
-                    @* <button class="form-tab"><span>Villa</span></button>
-                    <button class="form-tab"><span>Phòng đôi</span></button> *@
+                    <button class="form-tab active"><i class="fas fa-home"></i><span>Homestay</span></button>                  
                 </div>
                 <form action="/homestay" method="GET">
                     <div class="form-grid" style="display:flex;flex-wrap:wrap;gap:15px;align-items:end;">
@@ -107,19 +105,19 @@
                             <h2>Homestay tại Cát Bà</h2>
                             <p>Tìm thấy <span>@Model.TotalCount</span> homestay.</p>
                         </div>
-                    </div>
 
-                    <div class="results-controls">
-                        <div class="sort-control">
-                            <label>Sắp xếp</label>
-                            <select class="sort-select">
-                                <option>Phù hợp nhất</option>
-                                <option>Giá thấp đến cao</option>
-                                <option>Giá cao đến thấp</option>
-                                <option>Đánh giá cao nhất</option>
-                            </select>
+                        <div class="results-controls">
+                            <div class="sort-control">
+                                <label>Sắp xếp</label>
+                                <select class="sort-select">
+                                    <option>Phù hợp nhất</option>
+                                    <option>Giá thấp đến cao</option>
+                                    <option>Giá cao đến thấp</option>
+                                    <option>Đánh giá cao nhất</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
+                    </div>                   
 
                     <div class="homestay-grid">
                         @if (!Model.Items.Any())
@@ -168,7 +166,7 @@
                                         @(homestay.AreaName ?? homestay.Address)
                                     </div>
                                 </div>
-                                <a class="detail-btn" href="/homestay/detail/@homestay.BusinessId">Chi tiết</a>
+                                <a class="detail-btn" href="/homestay/detail/@homestay.BusinessId">Chi tiết</a> 
                             </div>
                         }
                     </div>
