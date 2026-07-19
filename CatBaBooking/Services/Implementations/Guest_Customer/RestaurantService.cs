@@ -22,11 +22,11 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
             _bookingRepo = bookingRepo;
         }
 
-        public RestaurantListViewModel GetRestaurants(int page)
+        public RestaurantListViewModel GetRestaurants(int page, int? areaId = null, string? restaurantType = null, List<int>? minRating = null, string? sortOrder = null)
         {
             if (page < 1) page = 1;
             int totalCount;
-            var restaurants = _businessRepo.GetRestaurants(page, PageSize, out totalCount);
+            var restaurants = _businessRepo.GetRestaurants(page, PageSize, out totalCount, areaId, restaurantType, minRating, sortOrder);
             var items = restaurants.Select(r => new RestaurantCardViewModel
             {
                 BusinessId = r.BusinessId,
@@ -44,7 +44,11 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
                 Items = items,
                 TotalCount = totalCount,
                 CurrentPage = page,
-                PageSize = PageSize
+                PageSize = PageSize,
+                AreaId = areaId,
+                RestaurantType = restaurantType,
+                MinRating = minRating ?? new List<int>(),
+                SortOrder = sortOrder
             };
         }
 

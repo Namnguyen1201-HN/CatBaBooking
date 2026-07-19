@@ -24,4 +24,10 @@ public class RestaurantListViewModel
     public int CurrentPage { get; set; }
     public int PageSize { get; set; }
     public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
+
+    // Filters
+    public int? AreaId { get; set; }
+    public string? RestaurantType { get; set; }
+    public List<int>? MinRating { get; set; } = new List<int>();
+    public string? SortOrder { get; set; }
 }

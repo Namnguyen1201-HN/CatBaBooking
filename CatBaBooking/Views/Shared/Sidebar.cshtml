@@ -1,3 +1,4 @@
+@using Microsoft.AspNetCore.Http
 <!-- Sidebar/Header partial - include in pages -->
 <header class="header">
     <div class="top-bar">
@@ -21,51 +22,74 @@
                     <span>Đặt chỗ</span>
                 </div>
                 <div class="top-bar-right">
-                    <!-- Logged in state -->
-                    <div class="user-logged-in">
-                        <div class="user-dropdown" id="userDropdown">
-                            <i class="fas fa-user-circle"></i>
-                            <span>Nguyễn Văn A</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="dropdown-menu" id="dropdownMenu">
-                            <div class="user-info">
-                                <img src="https://via.placeholder.com/40" alt="Avatar" class="avatar">
-                                <div>
-                                    <strong>Nguyễn Văn A</strong>
-                                </div>
+                    @if (Context.Session.GetString("UserId") != null)
+                    {
+                        var userName = Context.Session.GetString("UserName") ?? "Người dùng";
+                        <!-- Logged in state -->
+                        <div class="user-logged-in">
+                            <div class="user-dropdown" id="userDropdown">
+                                <i class="fas fa-user-circle"></i>
+                                <span>@userName</span>
+                                <i class="fas fa-chevron-down"></i>
                             </div>
-                            <ul class="dropdown-list">
-                                <li>
-                                    <a href="/profile-user">
-                                        <i class="fas fa-user-edit"></i> Edit Profile
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/my-booking">
-                                        <i class="fas fa-calendar-check"></i> My Booking
-                                    </a>
-                                </li>
-                                <li class="logout-item">
-                                    <a href="#" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?')">
-                                        <i class="fas fa-sign-out-alt"></i> Logout
-                                    </a>
-                                </li>
-                            </ul>
+                            <div class="dropdown-menu" id="dropdownMenu">
+                                <div class="user-info">
+                                    <img src="https://via.placeholder.com/40" alt="Avatar" class="avatar">
+                                    <div>
+                                        <strong>@userName</strong>
+                                    </div>
+                                </div>
+                                <ul class="dropdown-list">
+                                    <li>
+                                        <a href="/profile-user">
+                                            <i class="fas fa-user-edit"></i> Edit Profile
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/my-booking">
+                                            <i class="fas fa-calendar-check"></i> My Booking
+                                        </a>
+                                    </li>
+                                    <li class="logout-item">
+                                        <a href="#" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?')">
+                                            <i class="fas fa-sign-out-alt"></i> Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                    <!-- Uncomment below for guest state -->
-                    <!--
-                    <div class="user-buttons">
-                        <a href="/login" class="user-btn login-btn">
-                            <i class="fas fa-user"></i>
-                            <span>Log In</span>
-                        </a>
-                        <a href="/register" class="user-btn register-btn">
-                            <span>Register</span>
-                        </a>
-                    </div>
-                    -->
+                    }
+                    else
+                    {
+                        <!-- Guest state -->
+                        <div class="user-logged-in">
+                            <div class="user-dropdown" id="userDropdown">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Khách hàng</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="dropdown-menu" id="dropdownMenu">
+                                <div class="user-info">
+                                    <img src="https://via.placeholder.com/40" alt="Avatar" class="avatar">
+                                    <div>
+                                        <strong>Khách hàng</strong>
+                                    </div>
+                                </div>
+                                <ul class="dropdown-list">
+                                    <li>
+                                        <a href="/login">
+                                            <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/register-customer">
+                                            <i class="fas fa-user-plus"></i> Đăng ký
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

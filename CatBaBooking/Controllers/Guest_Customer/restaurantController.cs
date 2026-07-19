@@ -1,4 +1,4 @@
-﻿using CatBaBooking.Services.Interfaces.Guest_Customer;
+using CatBaBooking.Services.Interfaces.Guest_Customer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CatBaBooking.Controllers.Guest_Customer
@@ -13,9 +13,9 @@ namespace CatBaBooking.Controllers.Guest_Customer
         }
 
         [Route("restaurant-page")]
-        public IActionResult Index(int page = 1)
+        public IActionResult Index(int page = 1, int? areaId = null, string? restaurantType = null, [FromQuery] List<int>? minRating = null, string? sortOrder = null)
         {
-            var viewModel = _restaurantService.GetRestaurants(page);
+            var viewModel = _restaurantService.GetRestaurants(page, areaId, restaurantType, minRating, sortOrder);
             return View("~/Views/Home/Restaurant.cshtml", viewModel);
         }
 

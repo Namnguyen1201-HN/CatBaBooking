@@ -285,19 +285,7 @@ Layout = null;
                 });
             });
         });
-        const userDropdown = document.getElementById('userDropdown');
-        const dropdownMenu = document.getElementById('dropdownMenu');
-        if (userDropdown) {
-            userDropdown.addEventListener('click', function (e) {
-                e.stopPropagation();
-                dropdownMenu.classList.toggle('show');
-                userDropdown.classList.toggle('active');
-            });
-            document.addEventListener('click', function () {
-                dropdownMenu.classList.remove('show');
-                userDropdown.classList.remove('active');
-            });
-        }
+
     });
 </script>
 </body>
