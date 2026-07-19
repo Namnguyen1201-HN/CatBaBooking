@@ -31,40 +31,9 @@ Layout = null;
             <div class="sticky-icon"><i class="fa-solid fa-location-dot"></i></div>
             <div class="sticky-text">
                 <div class="sticky-label">Chỗ ở</div>
-                <div class="sticky-value">Homestay Ocean View Cát Bà</div>
+                <div class="sticky-value">@Model.Name, @Model.Address</div>
             </div>
         </div>
-        <div class="sticky-block">
-            <div class="sticky-icon"><i class="fa-regular fa-calendar"></i></div>
-            <div class="sticky-text">
-                <div class="sticky-label">Lịch ở</div>
-                <div class="sticky-value">
-                    <div class="date-input-group">
-                        <input type="date" id="checkin" name="checkIn" class="sticky-input">
-                        <i class="fa-solid fa-arrow-right"></i>
-                        <input type="date" id="checkout" name="checkOut" class="sticky-input">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="sticky-block">
-            <div class="sticky-icon"><i class="fa-solid fa-user-group"></i></div>
-            <div class="sticky-text">
-                <div class="guest-room-inline">
-                    <div class="mini-field">
-                        <label class="mini-label">Số người</label>
-                        <input type="number" id="guestsInput" class="mini-input" min="1" value="2" style="width:70px;padding:6px;border:1px solid #ddd;border-radius:6px;">
-                    </div>
-                    <div class="mini-field" style="margin-left:12px;">
-                        <label class="mini-label">Số phòng</label>
-                        <input type="number" id="roomsInput" class="mini-input" min="1" value="1" style="width:70px;padding:6px;border:1px solid #ddd;border-radius:6px;">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <button class="sticky-search-btn" onclick="performSearch()">
-            <i class="fa-solid fa-magnifying-glass"></i><span>Kiểm tra phòng trống</span>
-        </button>
     </div>
 </div>
 
@@ -205,8 +174,8 @@ Layout = null;
             <div class="section-card host-card">
                 <div class="section-title"><i class="fa-solid fa-user-tie"></i> <span>Chủ nhà</span></div>
                 <div class="host-header">
-                    <div class="host-avatar">NV</div>
-                    <div class="host-name-role"><span>Nguyễn Văn Bình</span><span>Chủ homestay</span></div>
+                    <div class="host-avatar">@(string.IsNullOrEmpty(Model.OwnerName) ? "C" : Model.OwnerName.Substring(0, 1).ToUpper())</div>
+                    <div class="host-name-role"><span>@(Model.OwnerName ?? "Chủ homestay")</span><span>Chủ homestay</span></div>
                 </div>
             </div>
         </div>
@@ -216,18 +185,8 @@ Layout = null;
 @await Html.PartialAsync("Footer")
 
 <script>
-    function performSearch() {
-        const checkIn = document.getElementById('checkin').value;
-        const checkOut = document.getElementById('checkout').value;
-        if (!checkIn || !checkOut) { alert('Vui lòng chọn ngày nhận phòng và trả phòng!'); return; }
-        if (new Date(checkIn) >= new Date(checkOut)) { alert('Ngày trả phòng phải sau ngày nhận phòng!'); return; }
-        alert('Đang kiểm tra phòng trống từ ' + checkIn + ' đến ' + checkOut);
-    }
     function bookRoom(roomId) {
-        const checkIn = document.getElementById('checkin').value;
-        const checkOut = document.getElementById('checkout').value;
-        if (!checkIn || !checkOut) { alert('Vui lòng chọn ngày trước khi đặt!'); return; }
-        window.location.href = '/booking-homestay';
+        window.location.href = '/booking-homestay?roomId=' + roomId + '&businessId=@Model.BusinessId';
     }
 </script>
 </body>

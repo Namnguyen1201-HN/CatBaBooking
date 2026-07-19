@@ -180,7 +180,7 @@
                             <span>Tổng cộng</span>
                             <span class="total-amount" id="totalAmount">0 ₫</span>
                         </div>
-                        <button type="button" id="checkoutBtn" class="checkout-btn" disabled onclick="window.location.href='/checkout-restaurant'">
+                        <button type="button" id="checkoutBtn" class="checkout-btn" disabled>
                             <i class="fas fa-lock"></i> Xác nhận đặt bàn
                         </button>
                     </div>
@@ -280,9 +280,40 @@
                 if (card && card.dataset.isAvailable === 'true') {
                     const id = card.dataset.dishId;
                     if (cart[id]) { cart[id].qty++; }
-                    else { cart[id] = { id, name: card.dataset.dishName, price: parseInt(card.dataset.dishPrice), img: card.dataset.dishImage, qty: 1 }; }
+                    else { cart[id] = { id: parseInt(id), name: card.dataset.dishName, price: parseInt(card.dataset.dishPrice), img: card.dataset.dishImage, qty: 1 }; }
                     renderCart();
                 }
+            }
+        });
+
+        // Checkout process
+        const businessId = @Model.BusinessId;
+        checkoutBtn.addEventListener('click', async () => {
+            const items = Object.values(cart);
+            if (items.length === 0) return;
+
+            checkoutBtn.disabled = true;
+            checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+            try {
+                const response = await fetch('/cart/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ businessId: businessId, items: items })
+                });
+
+                if (response.ok) {
+                    window.location.href = `/checkout-restaurant?businessId=${businessId}`;
+                } else {
+                    alert('Đã xảy ra lỗi khi lưu giỏ hàng.');
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.innerHTML = '<i class="fas fa-lock"></i> Xác nhận đặt bàn';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Lỗi kết nối.');
+                checkoutBtn.disabled = false;
+                checkoutBtn.innerHTML = '<i class="fas fa-lock"></i> Xác nhận đặt bàn';
             }
         });
 

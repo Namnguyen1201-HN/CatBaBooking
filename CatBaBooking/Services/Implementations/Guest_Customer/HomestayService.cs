@@ -1,17 +1,21 @@
-﻿using CatBaBooking.Repositories.Interfaces;
+using CatBaBooking.Repository.Interface;
 using CatBaBooking.Services.Interfaces.Guest_Customer;
 using CatBaBooking.ViewModels.Homestay;
+using CatBaBooking.Repositories.Interfaces;
+using CatBaBooking.Models;
 
 namespace CatBaBooking.Services.Implementations.Guest_Customer
 {
     public class HomestayService : IHomestayService //NamNS
     {
         private readonly IBusinessRepository _businessRepo;
+        private readonly IBookingRepository _bookingRepo;
         private const int PageSize = 6; 
 
-        public HomestayService(IBusinessRepository businessRepo)
+        public HomestayService(IBusinessRepository businessRepo, IBookingRepository bookingRepo)
         {
             _businessRepo = businessRepo;
+            _bookingRepo = bookingRepo;
         }
 
         public HomestayListViewModel GetHomestays(int page)
@@ -79,12 +83,65 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
                 Address = homestay.Address,
                 AreaName = homestay.Area?.Name,
                 ThumbnailUrl = homestay.Image,
+                OwnerName = homestay.Owner?.FullName ?? "Chủ homestay",
                 AverageRating = (double)(homestay.AvgRating ?? 0),
                 ReviewCount = homestay.ReviewCount ?? 0,
                 Rooms = rooms,
                 RecentReviews = reviews,
                 Amenities = amenities
             };
+        }
+
+        public BookingHomestayViewModel GetBookingInfo(int roomId, int businessId)
+        {
+            var homestay = _businessRepo.GetHomestayDetail(businessId);
+            if (homestay == null) return null;
+
+            var room = homestay.Rooms.FirstOrDefault(r => r.RoomId == roomId);
+            if (room == null) return null;
+
+            return new BookingHomestayViewModel
+            {
+                RoomId = room.RoomId,
+                BusinessId = homestay.BusinessId,
+                RoomName = room.Name,
+                HomestayName = homestay.Name,
+                Address = homestay.Address,
+                PricePerNight = room.PricePerNight,
+                ThumbnailUrl = homestay.Image,
+                MaxCapacity = room.Capacity
+            };
+        }
+
+        public string? PlaceBooking(CheckoutHomestayViewModel model, int? userId)
+        {
+            var booking = new Booking
+            {
+                BookingCode = "HOM" + DateTime.Now.ToString("yyyyMMddHHmmss") + (userId?.ToString() ?? "G"),
+                UserId = userId,
+                BusinessId = model.BusinessId,
+                BookerName = model.BookerName,
+                BookerEmail = model.BookerEmail,
+                BookerPhone = model.BookerPhone,
+                NumGuests = model.NumGuests,
+                TotalPrice = model.TotalAmount,
+                Notes = model.Notes,
+                ReservationDate = model.CheckIn, // Store CheckIn as ReservationDate
+                ReservationEndTime = model.CheckOut.ToDateTime(TimeOnly.MinValue), // Or another appropriate field
+                Status = "Pending",
+                CreatedAt = DateTime.Now
+            };
+
+            var bookedRoom = new BookedRoom
+            {
+                RoomId = model.RoomId,
+                PriceAtBooking = model.PricePerNight
+            };
+
+            booking.BookedRooms.Add(bookedRoom);
+
+            var createdBooking = _bookingRepo.CreateBooking(booking, null); // null for bookingDishes
+            return createdBooking?.BookingCode;
         }
 
     }

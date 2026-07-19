@@ -83,8 +83,9 @@ public class BusinessRepository : IBusinessRepository
             .Include(b => b.Rooms)
             .Include(b => b.Amenities)
             .Include(b => b.Reviews)
-            .ThenInclude(r => r.User) 
-            .FirstOrDefault(b => b.BusinessId == businessId && b.Type == "homestay");
+            .ThenInclude(r => r.User)
+            .Include(b => b.Owner)
+            .FirstOrDefault(b => b.BusinessId == businessId && b.Type.ToLower() == "homestay");
     }
 
     public Business GetRestaurantDetail(int businessId) //NamNS

@@ -1,4 +1,4 @@
-using CatBaBooking.Repositories.Interfaces;
+using CatBaBooking.Repository.Interface;
 using CatBaBooking.Services.Interfaces.Guest_Customer;
 using CatBaBooking.ViewModels.Homestay;
 using CatBaBooking.ViewModels.Restaurant;
