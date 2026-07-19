@@ -72,7 +72,7 @@ namespace CatBaBooking.Controllers.Guest_Customer
             var bookingCode = _homestayService.PlaceBooking(model, userId);
             if (bookingCode != null)
             {
-                return RedirectToAction("ConfirmationPayment", "home", new { bookingCode = bookingCode });
+                return RedirectToAction("ConfirmationPayment", "confirmationPayment", new { bookingCode = bookingCode });
             }
 
             ModelState.AddModelError("", "Đặt phòng thất bại. Vui lòng thử lại.");

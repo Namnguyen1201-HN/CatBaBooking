@@ -118,7 +118,7 @@ namespace CatBaBooking.Controllers.Guest_Customer
                 {
                     HttpContext.Session.Remove($"GuestCart_{model.BusinessId}");
                 }
-                return RedirectToAction("ConfirmationPayment", "home", new { bookingCode = bookingCode });
+                return RedirectToAction("ConfirmationPayment", "confirmationPayment", new { bookingCode = bookingCode });
             }
 
             ModelState.AddModelError("", "Đặt bàn thất bại. Vui lòng thử lại.");

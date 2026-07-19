@@ -1,6 +1,6 @@
 namespace CatBaBooking.ViewModels.Restaurant;
 
-/// <summary>Card tóm tắt Restaurant dùng trong trang listing.</summary>
+
 public class RestaurantCardViewModel
 {
     public int BusinessId { get; set; }
@@ -16,7 +16,7 @@ public class RestaurantCardViewModel
     public int ReviewCount { get; set; }
 }
 
-/// <summary>ViewModel trang danh sách Restaurant (với phân trang).</summary>
+
 public class RestaurantListViewModel
 {
     public IEnumerable<RestaurantCardViewModel> Items { get; set; } = new List<RestaurantCardViewModel>();

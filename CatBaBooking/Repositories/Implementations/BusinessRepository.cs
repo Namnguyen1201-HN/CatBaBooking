@@ -25,7 +25,7 @@ public class BusinessRepository : IBusinessRepository
         return true;
     }
 
-    public List<Business> GetFeaturedHomestays(int count) //NamNS
+    public List<Business> GetFeaturedHomestays(int count) 
     {
         return _context.Businesses
             .Include(b => b.Area)
@@ -36,7 +36,7 @@ public class BusinessRepository : IBusinessRepository
             .ToList();
     }
 
-    public List<Business> GetFeaturedRestaurants(int count) //NamNS
+    public List<Business> GetFeaturedRestaurants(int count) 
     {
         return _context.Businesses
             .Include(b => b.Area)
@@ -46,7 +46,11 @@ public class BusinessRepository : IBusinessRepository
             .ToList(); 
     }
 
-    public List<Business> GetHomestays(int page, int pageSize, out int totalCount, int? areaId = null, DateTime? checkIn = null, DateTime? checkOut = null, int? guests = null, int? numRooms = null, string? priceRange = null, List<int>? minRating = null, List<int>? amenityIds = null, string? sortOrder = null) //NamNS
+    public List<Business> GetHomestays(int page, int pageSize, out int totalCount, 
+                                        int? areaId = null,                                                                         
+                                        string? priceRange = null, 
+                                        List<int>? minRating = null, 
+                                        List<int>? amenityIds = null, string? sortOrder = null) 
     {
         var query = _context.Businesses
             .Include(b => b.Area)
@@ -54,30 +58,10 @@ public class BusinessRepository : IBusinessRepository
             .Include(b => b.Amenities)
             .Where(b => b.Type == "Homestay" && b.Status == "active"); 
 
+        //Fillter động
         if (areaId.HasValue && areaId.Value > 0)
         {
             query = query.Where(b => b.AreaId == areaId.Value);
-        }
-
-        if (guests.HasValue && guests.Value > 1)
-        {
-            query = query.Where(b => b.Capacity >= guests.Value);
-        }
-
-        if (numRooms.HasValue && numRooms.Value > 1)
-        {
-            query = query.Where(b => b.NumBedrooms >= numRooms.Value);
-        }
-
-        if (checkIn.HasValue && checkOut.HasValue)
-        {
-            query = query.Where(b => 
-                (b.NumBedrooms ?? 0) - b.Bookings.Where(booking => 
-                    (booking.Status == "Confirmed" || booking.Status == "Pending") && 
-                    booking.ReservationStartTime < checkOut.Value && 
-                    booking.ReservationEndTime > checkIn.Value
-                ).SelectMany(bk => bk.BookedRooms).Count() >= (numRooms ?? 1)
-            );
         }
 
         if (!string.IsNullOrEmpty(priceRange))
@@ -136,7 +120,11 @@ public class BusinessRepository : IBusinessRepository
             .ToList(); 
     }
 
-    public List<Business> GetRestaurants(int page, int pageSize, out int totalCount, int? areaId = null, string? restaurantType = null, List<int>? minRating = null, string? sortOrder = null) //NamNS
+    public List<Business> GetRestaurants(int page, int pageSize, out int totalCount, 
+                                            int? areaId = null, 
+                                            string? restaurantType = null, 
+                                            List<int>? minRating = null, 
+                                            string? sortOrder = null) 
     {
         var query = _context.Businesses
             .Include(b => b.Area)
@@ -180,7 +168,7 @@ public class BusinessRepository : IBusinessRepository
             .ToList();
     }
 
-    public Business GetHomestayDetail(int businessId) //NamNS
+    public Business GetHomestayDetail(int businessId) 
     {
         return _context.Businesses
             .Include(b => b.Area)
@@ -192,7 +180,7 @@ public class BusinessRepository : IBusinessRepository
             .FirstOrDefault(b => b.BusinessId == businessId && b.Type.ToLower() == "homestay");
     }
 
-    public Business GetRestaurantDetail(int businessId) //NamNS
+    public Business GetRestaurantDetail(int businessId) 
     {
         return _context.Businesses
             .Include(b => b.Area)

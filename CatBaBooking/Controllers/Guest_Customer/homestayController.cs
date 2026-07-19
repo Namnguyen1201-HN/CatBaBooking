@@ -13,9 +13,18 @@ namespace CatBaBooking.Controllers.Guest_Customer
         }
 
         [Route("homestay-page")]
-        public IActionResult Index(int page = 1, int? areaId = null, DateTime? checkIn = null, DateTime? checkOut = null, int? guests = null, int? numRooms = null, string? priceRange = null, [FromQuery] List<int>? minRating = null, [FromQuery] List<int>? amenityIds = null, string? sortOrder = null)
+        public IActionResult Index(int page = 1, 
+                                int? areaId = null, 
+                                DateTime? checkIn = null, 
+                                DateTime? checkOut = null, 
+                                int? guests = null, 
+                                int? numRooms = null, 
+                                string? priceRange = null, 
+                                [FromQuery] List<int>? minRating = null, 
+                                [FromQuery] List<int>? amenityIds = null, 
+                                string? sortOrder = null)
         {
-            var viewModel = _homestayService.GetHomestays(page, areaId, checkIn, checkOut, guests, numRooms, priceRange, minRating, amenityIds, sortOrder);       
+            var viewModel = _homestayService.GetHomestays(page, areaId, priceRange, minRating, amenityIds, sortOrder);       
             return View("~/Views/Home/Homestay.cshtml", viewModel);
         }
 

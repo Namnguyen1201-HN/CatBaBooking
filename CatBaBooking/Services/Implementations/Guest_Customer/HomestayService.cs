@@ -6,7 +6,7 @@ using CatBaBooking.Models;
 
 namespace CatBaBooking.Services.Implementations.Guest_Customer
 {
-    public class HomestayService : IHomestayService //NamNS
+    public class HomestayService : IHomestayService 
     {
         private readonly IBusinessRepository _businessRepo;
         private readonly IBookingRepository _bookingRepo;
@@ -18,7 +18,12 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
             _bookingRepo = bookingRepo;
         }
 
-        public HomestayListViewModel GetHomestays(int page, int? areaId = null, DateTime? checkIn = null, DateTime? checkOut = null, int? guests = null, int? numRooms = null, string? priceRange = null, List<int>? minRating = null, List<int>? amenityIds = null, string? sortOrder = null)
+        public HomestayListViewModel GetHomestays(int page, 
+                                                int? areaId = null,                                            
+                                                string? priceRange = null, 
+                                                List<int>? minRating = null, 
+                                                List<int>? amenityIds = null, 
+                                                string? sortOrder = null)
         {
             if (page < 1)
             {
@@ -26,7 +31,7 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
             }
 
             int totalCount;
-            var homestays = _businessRepo.GetHomestays(page, PageSize, out totalCount, areaId, checkIn, checkOut, guests, numRooms, priceRange, minRating, amenityIds, sortOrder);
+            var homestays = _businessRepo.GetHomestays(page, PageSize, out totalCount, areaId, priceRange, minRating, amenityIds, sortOrder);
 
             var items = homestays.Select(h => new HomestayCardViewModel
             {
@@ -47,10 +52,6 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
                 CurrentPage = page,
                 PageSize = PageSize,
                 AreaId = areaId,
-                CheckIn = checkIn,
-                CheckOut = checkOut,
-                Guests = guests,
-                NumRooms = numRooms,
                 PriceRange = priceRange,
                 MinRating = minRating ?? new List<int>(),
                 AmenityIds = amenityIds ?? new List<int>(),

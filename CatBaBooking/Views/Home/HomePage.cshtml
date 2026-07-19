@@ -196,25 +196,21 @@ Layout = null;
                            
                             <div class="card-content">
                                 <div class="rating">
-                                    <div class="stars">
-                                        
+                                    <div class="stars">                                 
                                         @{
                                             int rFullStars = (int)Math.Floor(restaurant.AverageRating);
                                             bool rHasHalf = (restaurant.AverageRating - rFullStars) >= 0.5;
                                         }
-
                                         
                                         @for (int i = 0; i < rFullStars; i++)
                                         {
                                             <i class="fas fa-star"></i>
                                         }
-
                                         
                                         @if (rHasHalf)
                                         {
                                             <i class="fas fa-star-half-alt"></i>
                                         }
-
                                         
                                         @for (int i = rFullStars + (rHasHalf ? 1 : 0); i < 5; i++)
                                         {

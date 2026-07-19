@@ -5,7 +5,7 @@ using CatBaBooking.ViewModels.Restaurant;
 
 namespace CatBaBooking.Services.Implementations.Guest_Customer;
 
-public class HomeService : IHomeService //NamNS
+public class HomeService : IHomeService 
 {
     private readonly IBusinessRepository _businessRepo;
 
@@ -16,10 +16,9 @@ public class HomeService : IHomeService //NamNS
 
     public List<HomestayCardViewModel> GetFeaturedHomestays()
     {
-        // Gọi Repository đồng bộ
         var homestays = _businessRepo.GetFeaturedHomestays(3);
         
-        // Map sang ViewModel
+        // Map to ViewModel
         return homestays.Select(h => new HomestayCardViewModel
         {
             BusinessId = h.BusinessId,
@@ -34,11 +33,9 @@ public class HomeService : IHomeService //NamNS
     }
 
     public List<RestaurantCardViewModel> GetFeaturedRestaurants()
-    {
-        // Gọi Repository đồng bộ
+    {       
         var restaurants = _businessRepo.GetFeaturedRestaurants(3);
         
-        // Map sang ViewModel
         return restaurants.Select(r => new RestaurantCardViewModel
         {
             BusinessId = r.BusinessId,
