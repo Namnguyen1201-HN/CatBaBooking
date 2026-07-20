@@ -1,6 +1,52 @@
-
+@using CatBaBooking.Models
 @{
     Layout = null;
+
+    List<Booking> bookings = ViewBag.Bookings ?? new List<Booking>();
+    int totalCount = ViewBag.TotalCount;
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+
+    string? status = ViewBag.Status;
+    string? type = ViewBag.Type;
+    string? search = ViewBag.Search;
+
+    string BadgeClass(string s) => s switch
+    {
+        "confirmed" or "completed" => "confirmed",
+        "pending" => "pending",
+        _ => "cancelled"
+    };
+
+    string BadgeLabel(string s) => s switch
+    {
+        "confirmed" => "Đã xác nhận",
+        "completed" => "Hoàn tất",
+        "pending" => "Đang chờ",
+        "cancelled_by_user" => "Khách hủy",
+        "cancelled_by_owner" => "Chủ hủy",
+        "no_show" => "Không đến",
+        _ => s
+    };
+
+    string TypeLabel(string? t) => t == "homestay" ? "Homestay" : "Nhà hàng";
+
+    (string Text, string Color) PaymentLabel(string? p) => p switch
+    {
+        "fully_paid" => ("Đã thanh toán", "#166534"),
+        "partially_paid" => ("Thanh toán một phần", "#b45309"),
+        "refunded" => ("Đã hoàn tiền", "#64748b"),
+        _ => ("Chưa thanh toán", "#b91c1c")
+    };
+
+    string QueryString(int targetPage)
+    {
+        var parts = new List<string> { $"page={targetPage}" };
+        if (!string.IsNullOrEmpty(status)) parts.Add($"status={Uri.EscapeDataString(status)}");
+        if (!string.IsNullOrEmpty(type)) parts.Add($"type={Uri.EscapeDataString(type)}");
+        if (!string.IsNullOrEmpty(search)) parts.Add($"search={Uri.EscapeDataString(search)}");
+        return "/booking-history?" + string.Join("&", parts);
+    }
 }
 
 <!DOCTYPE html>
@@ -35,29 +81,13 @@
         .pagination a, .pagination span { padding:8px 12px; border:1px solid #e2e8f0; border-radius:6px; text-decoration:none; color:#334155; font-size:14px; }
         .pagination a:hover { background:#f8fafc; }
         .pagination .current { background:#3b82f6; color:#fff; border-color:#3b82f6; }
+        .pagination .disabled { color:#cbd5e1; pointer-events:none; }
         .info-badge { display:inline-block; padding:4px 8px; background:#e0e7ff; color:#3730a3; border-radius:4px; font-size:12px; font-weight:500; }
         .table-footer { padding:16px; background:#f8fafc; border-top:1px solid #e2e8f0; color:#64748b; font-size:14px; }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">Admin Panel</div>
-        <div class="user-info">
-            <div class="user-avatar">A</div>
-            <span class="user-name">Admin</span>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dash-board">Dashboard</a></li>
-            <li class="active"><a href="/booking-history">Lịch sử Booking</a></li>
-            <li><a href="/approve-application">Duyệt Yêu Cầu</a></li>
-            <li><a href="/user-management">Quản Lý Người Dùng</a></li>
-            <li><a href="/permissions-manager">Quản Lý Phân Quyền</a></li>
-            <li><a href="/feedback-management">Quản Lý Phản Hồi</a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button type="button" class="logout-btn">Đăng xuất</button>
-        </div>
-    </div>
+    @await Html.PartialAsync("AdminSidebar")
 
     <div class="main-content">
         <div class="page-header">
@@ -67,34 +97,37 @@
             </div>
         </div>
 
-        <div class="filters-section">
+        <form class="filters-section" method="get" action="/booking-history">
             <div class="filters-form">
                 <div class="filter-group">
                     <label>Trạng thái</label>
-                    <select>
-                        <option value="all">Tất cả</option>
-                        <option value="confirmed">Đã xác nhận</option>
-                        <option value="cancelled_by_user">Đã hủy (User)</option>
-                        <option value="cancelled_by_owner">Đã hủy (Owner)</option>
+                    <select name="status">
+                        <option value="all" selected="@(string.IsNullOrEmpty(status))">Tất cả</option>
+                        <option value="pending" selected="@(status == "pending")">Đang chờ</option>
+                        <option value="confirmed" selected="@(status == "confirmed")">Đã xác nhận</option>
+                        <option value="completed" selected="@(status == "completed")">Hoàn tất</option>
+                        <option value="cancelled_by_user" selected="@(status == "cancelled_by_user")">Đã hủy (Khách)</option>
+                        <option value="cancelled_by_owner" selected="@(status == "cancelled_by_owner")">Đã hủy (Chủ CS)</option>
+                        <option value="no_show" selected="@(status == "no_show")">Không đến</option>
                     </select>
                 </div>
                 <div class="filter-group">
                     <label>Loại hình</label>
-                    <select>
-                        <option value="all">Tất cả</option>
-                        <option value="homestay">Homestay</option>
-                        <option value="restaurant">Nhà hàng</option>
+                    <select name="type">
+                        <option value="all" selected="@(string.IsNullOrEmpty(type))">Tất cả</option>
+                        <option value="homestay" selected="@(type == "homestay")">Homestay</option>
+                        <option value="restaurant" selected="@(type == "restaurant")">Nhà hàng</option>
                     </select>
                 </div>
                 <div class="filter-group">
                     <label>Tìm kiếm</label>
-                    <input type="text" placeholder="Mã booking, tên, email, SĐT...">
+                    <input type="text" name="search" value="@search" placeholder="Mã booking, tên, email, SĐT...">
                 </div>
                 <div class="filter-group">
-                    <button type="button" class="btn-filter">Lọc</button>
+                    <button type="submit" class="btn-filter">Lọc</button>
                 </div>
             </div>
-        </div>
+        </form>
 
         <div style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; overflow:hidden;">
             <table class="bookings-table">
@@ -112,74 +145,70 @@
                     </tr>
                 </thead>
                 <tbody>
+                @if (!bookings.Any())
+                {
                     <tr>
-                        <td><strong>#BK2025001</strong></td>
-                        <td>Nguyễn Văn An<br><small style="color:#94a3b8;">an.nguyen@email.com</small></td>
-                        <td>Homestay Đà Lạt Xanh<br><small style="color:#94a3b8;">45 Trần Phú, Đà Lạt</small></td>
-                        <td><span class="info-badge">Homestay</span></td>
-                        <td>3 người</td>
-                        <td><strong>₫2,400,000</strong></td>
-                        <td><span style="color:#166534; font-weight:500;">Đã thanh toán</span></td>
-                        <td><span class="status-badge confirmed">Đã xác nhận</span></td>
-                        <td>01/06/2025</td>
+                        <td colspan="9" style="text-align:center; color:#94a3b8;">Không tìm thấy booking nào phù hợp.</td>
                     </tr>
-                    <tr>
-                        <td><strong>#BK2025002</strong></td>
-                        <td>Trần Thị Bình<br><small style="color:#94a3b8;">binh.tran@email.com</small></td>
-                        <td>Nhà hàng Phố Cổ<br><small style="color:#94a3b8;">12 Hội An, Quảng Nam</small></td>
-                        <td><span class="info-badge">Nhà hàng</span></td>
-                        <td>6 người</td>
-                        <td><strong>₫1,800,000</strong></td>
-                        <td><span style="color:#b45309; font-weight:500;">Thanh toán một phần</span></td>
-                        <td><span class="status-badge pending">Đang chờ</span></td>
-                        <td>03/06/2025</td>
-                    </tr>
-                    <tr>
-                        <td><strong>#BK2025003</strong></td>
-                        <td>Lê Minh Cường<br><small style="color:#94a3b8;">cuong.le@email.com</small></td>
-                        <td>Homestay Hội An Garden<br><small style="color:#94a3b8;">Hội An, Quảng Nam</small></td>
-                        <td><span class="info-badge">Homestay</span></td>
-                        <td>2 người</td>
-                        <td><strong>₫3,200,000</strong></td>
-                        <td><span style="color:#b91c1c; font-weight:500;">Chưa thanh toán</span></td>
-                        <td><span class="status-badge cancelled">Đã hủy</span></td>
-                        <td>05/06/2025</td>
-                    </tr>
-                    <tr>
-                        <td><strong>#BK2025004</strong></td>
-                        <td>Phạm Thu Dung<br><small style="color:#94a3b8;">dung.pham@email.com</small></td>
-                        <td>Quán Ăn Bà Ngoại<br><small style="color:#94a3b8;">18 Lê Lợi, TP.HCM</small></td>
-                        <td><span class="info-badge">Nhà hàng</span></td>
-                        <td>4 người</td>
-                        <td><strong>₫950,000</strong></td>
-                        <td><span style="color:#166534; font-weight:500;">Đã thanh toán</span></td>
-                        <td><span class="status-badge confirmed">Đã xác nhận</span></td>
-                        <td>06/06/2025</td>
-                    </tr>
-                    <tr>
-                        <td><strong>#BK2025005</strong></td>
-                        <td>Hoàng Quốc Việt<br><small style="color:#94a3b8;">viet.hoang@email.com</small></td>
-                        <td>Villa Sapa Mist<br><small style="color:#94a3b8;">Sapa, Lào Cai</small></td>
-                        <td><span class="info-badge">Homestay</span></td>
-                        <td>5 người</td>
-                        <td><strong>₫5,600,000</strong></td>
-                        <td><span style="color:#166534; font-weight:500;">Đã thanh toán</span></td>
-                        <td><span class="status-badge confirmed">Đã xác nhận</span></td>
-                        <td>07/06/2025</td>
-                    </tr>
+                }
+                else
+                {
+                    @foreach (var b in bookings)
+                    {
+                        var payment = PaymentLabel(b.PaymentStatus);
+                        <tr>
+                            <td><strong>#@b.BookingCode</strong></td>
+                            <td>@b.BookerName<br><small style="color:#94a3b8;">@b.BookerEmail</small></td>
+                            <td>@(b.Business?.Name ?? "")<br><small style="color:#94a3b8;">@(b.Business?.Address ?? "")</small></td>
+                            <td><span class="info-badge">@TypeLabel(b.Business?.Type)</span></td>
+                            <td>@b.NumGuests người</td>
+                            <td><strong>₫@b.TotalPrice.ToString("N0")</strong></td>
+                            <td><span style="color:@payment.Color; font-weight:500;">@payment.Text</span></td>
+                            <td><span class="status-badge @BadgeClass(b.Status)">@BadgeLabel(b.Status)</span></td>
+                            <td>@(b.CreatedAt?.ToString("dd/MM/yyyy") ?? "")</td>
+                        </tr>
+                    }
+                }
                 </tbody>
             </table>
 
-            <div class="pagination">
-                <span style="color:#999;">« Trước</span>
-                <span class="current">1</span>
-                <a href="#">2</a>
-                <a href="#">3</a>
-                <a href="#">Sau »</a>
-            </div>
+            @if (totalPages > 1)
+            {
+                <div class="pagination">
+                    @if (currentPage > 1)
+                    {
+                        <a href="@QueryString(currentPage - 1)">« Trước</a>
+                    }
+                    else
+                    {
+                        <span class="disabled">« Trước</span>
+                    }
+
+                    @for (int p = 1; p <= totalPages; p++)
+                    {
+                        if (p == currentPage)
+                        {
+                            <span class="current">@p</span>
+                        }
+                        else
+                        {
+                            <a href="@QueryString(p)">@p</a>
+                        }
+                    }
+
+                    @if (currentPage < totalPages)
+                    {
+                        <a href="@QueryString(currentPage + 1)">Sau »</a>
+                    }
+                    else
+                    {
+                        <span class="disabled">Sau »</span>
+                    }
+                </div>
+            }
 
             <div class="table-footer">
-                Tổng số: <strong>3,410</strong> booking
+                Tổng số: <strong>@totalCount.ToString("N0")</strong> booking
             </div>
         </div>
     </div>

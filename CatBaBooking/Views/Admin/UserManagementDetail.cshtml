@@ -1,0 +1,126 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Chi Tiết Người Dùng</title>
+    <link rel="stylesheet" href="/css/Admin/admin-style.css">
+    <style>
+            .btn-back {
+                background-color: #d9d9d9;
+                color: #333;
+                padding: 8px 16px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+            }
+
+                .btn-back:hover {
+                    background-color: #bfbfbf;
+                }
+            /* admin-style.css định nghĩa .detail-view { display:none } cho pattern list/detail toggle bằng JS.
+                       Trang này luôn cần hiện nội dung nên phải ghi đè lại ở đây. */
+            .detail-view {
+                display: block !important;
+                background: #fff;
+                border-radius: 12px;
+                border: 1px solid #e2e8f0;
+                padding: 24px;
+            }
+
+                .detail-view h3 {
+                    margin-top: 0;
+                    color: #0f172a;
+                }
+
+            .detail-content {
+                display: grid;
+                grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+                gap: 24px;
+                margin-bottom: 24px;
+            }
+
+            .detail-column h4 {
+                color: #0f172a;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: .05em;
+                margin-bottom: 12px;
+            }
+
+            .detail-item {
+                margin-bottom: 10px;
+                color: #475569;
+                font-size: 14px;
+            }
+
+                .detail-item strong {
+                    color: #0f172a;
+                }
+
+            .status-active {
+                background: #dcfce7;
+                color: #166534;
+                padding: 4px 10px;
+                border-radius: 999px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .status-pending {
+                background: #fef3c7;
+                color: #b45309;
+                padding: 4px 10px;
+                border-radius: 999px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .status-rejected {
+                background: #fee2e2;
+                color: #b91c1c;
+                padding: 4px 10px;
+                border-radius: 999px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+    </style>
+</head>
+<body>
+    @await Html.PartialAsync("AdminSidebar")
+
+    <div class="main-content">
+        <main>
+            <div class="detail-view">
+                <h3>THÔNG TIN CHI TIẾT NGƯỜI DÙNG</h3>
+                <div class="detail-content">
+                    <div class="detail-column">
+                        <h4>Thông tin cá nhân</h4>
+                        <div class="detail-item"><strong>Họ và tên:</strong> &#x110;&#xE0;o V&#x103;n N&#x103;ng</div>
+                        <div class="detail-item"><strong>Email:</strong> nangdvhe187101@fpt.edu.vn</div>
+                        <div class="detail-item"><strong>Số điện thoại:</strong> </div>
+                        <div class="detail-item"><strong>Số CCCD:</strong> </div>
+                        <div class="detail-item"><strong>Địa chỉ cá nhân:</strong> </div>
+                        <div class="detail-item"><strong>Quyền:</strong> customer</div>
+                        <div class="detail-item"><strong>Trạng thái:</strong> <span class="status-rejected">Kh&#xF4;ng ho&#x1EA1;t &#x111;&#x1ED9;ng</span></div>
+                    </div>
+
+                </div>
+                <div style="text-align:center;">
+                    <a href="/user-management" class="btn-back">↩️ Quay lại danh sách</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Visual Studio Browser Link -->
+    <script type="text/javascript" src="/_vs/browserLink" async="async" id="__browserLink_initializationData" data-requestId="ffe4bc7c271145cfac6c1fc3b2a11cfb" data-requestMappingFromServer="false" data-connectUrl="http://localhost:49547/aa44b9b76d594fe39292a665d2fd474d/browserLink"></script>
+    <!-- End Browser Link -->
+    <script src="/_framework/aspnetcore-browser-refresh.js"></script>
+</body>
+</html>

@@ -1,6 +1,39 @@
-
+@using CatBaBooking.Models
 @{
     Layout = null;
+
+    IEnumerable<User> users = ViewBag.Users ?? new List<User>();
+    int totalCount = ViewBag.TotalCount;
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+
+    string? search = ViewBag.Search;
+    int? roleId = ViewBag.RoleId;
+    string? status = ViewBag.Status;
+    List<Role> roles = ViewBag.Roles ?? new List<Role>();
+
+    string StatusClass(string s) => s switch
+    {
+        "active" => "status-active",
+        "pending" => "status-pending",
+        _ => "status-rejected"
+    };
+
+    string StatusLabel(string s) => s switch
+    {
+        "active" => "Hoạt động",
+        "pending" => "Chờ duyệt",
+        _ => "Không hoạt động"
+    };
+
+    Func<int, string> pageUrl = p =>
+    {
+        var parts = new List<string> { $"page={p}" };
+        if (!string.IsNullOrEmpty(search)) parts.Add($"search={Uri.EscapeDataString(search)}");
+        if (roleId.HasValue) parts.Add($"roleId={roleId}");
+        if (!string.IsNullOrEmpty(status)) parts.Add($"status={Uri.EscapeDataString(status)}");
+        return "/user-management?" + string.Join("&", parts);
+    };
 }
 
 <!DOCTYPE html>
@@ -11,221 +44,348 @@
     <title>Admin - Quản Lý Người Dùng</title>
     <link rel="stylesheet" href="~/css/Admin/admin-style.css">
     <style>
-        .btn-back {
-            background-color: #d9d9d9;
-            color: #333;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-back:hover { background-color: #bfbfbf; }
+            .btn-back {
+                background-color: #d9d9d9;
+                color: #333;
+                padding: 8px 16px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+            }
+
+                .btn-back:hover {
+                    background-color: #bfbfbf;
+                }
+
+            .search-container {
+                display: flex;
+                gap: 12px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+            }
+
+                .search-container input, .search-container select {
+                    padding: 10px 12px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 6px;
+                    font-size: 14px;
+                }
+
+                .search-container button {
+                    padding: 10px 20px;
+                    background: #3b82f6;
+                    color: #fff;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: 500;
+                }
+
+                    .search-container button:hover {
+                        background: #2563eb;
+                    }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                background: #fff;
+                border-radius: 12px;
+                overflow: hidden;
+                border: 1px solid #e2e8f0;
+            }
+
+            thead {
+                background: #f8fafc;
+            }
+
+            th, td {
+                padding: 14px 16px;
+                text-align: left;
+                font-size: 14px;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+            .status-active {
+                background: #dcfce7;
+                color: #166534;
+                padding: 4px 10px;
+                border-radius: 999px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .status-pending {
+                background: #fef3c7;
+                color: #b45309;
+                padding: 4px 10px;
+                border-radius: 999px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .status-rejected {
+                background: #fee2e2;
+                color: #b91c1c;
+                padding: 4px 10px;
+                border-radius: 999px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .action-buttons {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .btn-view {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: #3b82f6;
+                color: #ffffff !important;
+                padding: 7px 14px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 13px;
+                text-decoration: none !important;
+                border: none;
+                white-space: nowrap;
+                transition: background .15s;
+            }
+
+                .btn-view svg {
+                    width: 14px;
+                    height: 14px;
+                    flex-shrink: 0;
+                }
+
+                .btn-view:hover {
+                    background: #2563eb;
+                }
+
+            .toggle-switch {
+                position: relative;
+                width: 40px;
+                height: 22px;
+            }
+
+                .toggle-switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+
+                .toggle-switch label {
+                    position: absolute;
+                    inset: 0;
+                    background: #cbd5e1;
+                    border-radius: 999px;
+                    cursor: pointer;
+                    transition: .2s;
+                }
+
+                    .toggle-switch label::before {
+                        content: "";
+                        position: absolute;
+                        width: 16px;
+                        height: 16px;
+                        left: 3px;
+                        top: 3px;
+                        background: #fff;
+                        border-radius: 50%;
+                        transition: .2s;
+                    }
+
+                .toggle-switch input:checked + label {
+                    background: #22c55e;
+                }
+
+                    .toggle-switch input:checked + label::before {
+                        transform: translateX(18px);
+                    }
+
+            .pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 8px;
+                margin-top: 20px;
+            }
+
+                .pagination a, .pagination span {
+                    padding: 8px 12px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 6px;
+                    text-decoration: none;
+                    color: #334155;
+                    font-size: 14px;
+                }
+
+                    .pagination a:hover {
+                        background: #f8fafc;
+                    }
+
+                .pagination .current {
+                    background: #3b82f6;
+                    color: #fff;
+                    border-color: #3b82f6;
+                }
+
+                .pagination .disabled {
+                    color: #cbd5e1;
+                    pointer-events: none;
+                }
+
+                .pagination .ellipsis {
+                    border: none;
+                }
+
+            .alert {
+                padding: 14px 18px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                font-size: 14px;
+            }
+
+            .alert-success {
+                background: #dcfce7;
+                color: #166534;
+                border: 1px solid #86efac;
+            }
+
+            .alert-error {
+                background: #fee2e2;
+                color: #b91c1c;
+                border: 1px solid #fca5a5;
+            }
+
+            .table-footer {
+                padding: 14px 16px;
+                background: #f8fafc;
+                border-top: 1px solid #e2e8f0;
+                color: #64748b;
+                font-size: 14px;
+                border-radius: 0 0 12px 12px;
+            }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">Admin Panel</div>
-        <div class="user-info">
-            <div class="user-avatar">A</div>
-            <span class="user-name">Admin</span>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dash-board">Dashboard</a></li>
-            <li><a href="/booking-history">Lịch sử Booking</a></li>
-            <li><a href="/approve-application">Duyệt Yêu Cầu</a></li>
-            <li class="active"><a href="/user-management">Quản Lý Người Dùng</a></li>
-            <li><a href="/permissions-manager">Quản Lý Phân Quyền</a></li>
-            <li><a href="/feedback-management">Quản Lý Phản Hồi</a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button type="button" class="logout-btn">Đăng xuất</button>
-        </div>
-    </div>
+    @await Html.PartialAsync("AdminSidebar")
 
     <div class="main-content">
         <main>
-            <!-- ===== LIST VIEW ===== -->
-            <div id="listView" style="display:block;">
-                <div class="search-container">
-                    <input type="text" placeholder="Tìm kiếm">
-                    <select>
-                        <option value="">Tất cả quyền</option>
-                        <option>Customer</option>
-                        <option>Owner Homestay</option>
-                        <option>Owner Restaurant</option>
-                    </select>
-                    <select>
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="active">Hoạt động</option>
-                        <option value="rejected">Không hoạt động</option>
-                    </select>
-                    <button type="button">Tìm kiếm</button>
-                </div>
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-error">@TempData["ErrorMessage"]</div>
+            }
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Họ Tên</th>
-                            <th>Email</th>
-                            <th>Quyền</th>
-                            <th>Trạng Thái</th>
-                            <th>Thao Tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Nguyễn Văn An</td>
-                            <td>an.nguyen@email.com</td>
-                            <td>Customer</td>
-                            <td><span class="status-active">Hoạt động</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a class="btn btn-view" href="#" onclick="showDetail('Nguyễn Văn An','an.nguyen@email.com','0901234567','001099000001','12 Nguyễn Huệ Q1 TP.HCM','Customer','active',false); return false;">Chi tiết</a>
-                                    <div class="toggle-switch">
-                                        <input type="checkbox" id="toggle1" checked onchange="toggleConfirm(this)">
-                                        <label for="toggle1"></label>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Trần Thị Bình</td>
-                            <td>binh.tran@email.com</td>
-                            <td>Owner Homestay</td>
-                            <td><span class="status-active">Hoạt động</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a class="btn btn-view" href="#" onclick="showDetail('Trần Thị Bình','binh.tran@email.com','0912345678','001099000002','45 Trần Phú Đà Lạt','Owner Homestay','active',true); return false;">Chi tiết</a>
-                                    <div class="toggle-switch">
-                                        <input type="checkbox" id="toggle2" checked onchange="toggleConfirm(this)">
-                                        <label for="toggle2"></label>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Lê Minh Cường</td>
-                            <td>cuong.le@email.com</td>
-                            <td>Customer</td>
-                            <td><span class="status-pending">Chờ duyệt</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a class="btn btn-view" href="#" onclick="showDetail('Lê Minh Cường','cuong.le@email.com','0923456789','001099000003','78 Lê Lợi TP.HCM','Customer','pending',false); return false;">Chi tiết</a>
-                                    <div class="toggle-switch">
-                                        <input type="checkbox" id="toggle3" onchange="toggleConfirm(this)">
-                                        <label for="toggle3"></label>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>Phạm Thu Dung</td>
-                            <td>dung.pham@email.com</td>
-                            <td>Owner Restaurant</td>
-                            <td><span class="status-rejected">Không hoạt động</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a class="btn btn-view" href="#" onclick="showDetail('Phạm Thu Dung','dung.pham@email.com','0934567890','001099000004','18 Lê Lợi TP.HCM','Owner Restaurant','rejected',true); return false;">Chi tiết</a>
-                                    <div class="toggle-switch">
-                                        <input type="checkbox" id="toggle4" onchange="toggleConfirm(this)">
-                                        <label for="toggle4"></label>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>Hoàng Quốc Việt</td>
-                            <td>viet.hoang@email.com</td>
-                            <td>Customer</td>
-                            <td><span class="status-active">Hoạt động</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a class="btn btn-view" href="#" onclick="showDetail('Hoàng Quốc Việt','viet.hoang@email.com','0945678901','001099000005','Sapa Lào Cai','Customer','active',false); return false;">Chi tiết</a>
-                                    <div class="toggle-switch">
-                                        <input type="checkbox" id="toggle5" checked onchange="toggleConfirm(this)">
-                                        <label for="toggle5"></label>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <form class="search-container" method="get" action="/user-management">
+                <input type="text" name="search" value="@search" placeholder="Tìm kiếm theo tên hoặc email">
+                <select name="roleId">
+                    <option value="">Tất cả quyền</option>
+                    @foreach (var r in roles)
+                    {
+                        <option value="@r.RoleId" selected="@(roleId == r.RoleId)">@r.RoleName</option>
+                    }
+                </select>
+                <select name="status">
+                    <option value="all" selected="@(string.IsNullOrEmpty(status))">Tất cả trạng thái</option>
+                    <option value="active" selected="@(status == "active")">Hoạt động</option>
+                    <option value="pending" selected="@(status == "pending")">Chờ duyệt</option>
+                    <option value="rejected" selected="@(status == "rejected")">Không hoạt động</option>
+                </select>
+                <button type="submit">Tìm kiếm</button>
+            </form>
 
-                <div class="pagger">
-                    <span style="color:#999;">« Trước</span>
-                    <span style="background:#007bff; color:#fff; border:1px solid #007bff; padding:8px 14px; border-radius:4px;">1</span>
-                    <a href="#">2</a>
-                    <a href="#">3</a>
-                    <a href="#">Sau »</a>
-                </div>
-            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Họ Tên</th>
+                        <th>Email</th>
+                        <th>Quyền</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!users.Any())
+                    {
+                        <tr>
+                            <td colspan="6" style="text-align:center; color:#94a3b8;">Không tìm thấy người dùng nào.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        int stt = (currentPage - 1) * 10 + 1;
+                        @foreach (var u in users)
+                        {
+                            string toggleId = $"toggle{u.UserId}";
+                            <tr>
+                                <td>@(stt++)</td>
+                                <td>@u.FullName</td>
+                                <td>@u.Email</td>
+                                <td>@(u.Role?.RoleName ?? "")</td>
+                                <td><span class="@StatusClass(u.Status)">@StatusLabel(u.Status)</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a class="btn-view" href="/user-management/@u.UserId">
+                                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+                                            </svg>
+                                            Chi tiết
+                                        </a>
+                                        <form method="post" action="/user-management/@u.UserId/toggle-status" id="form-@toggleId">
+                                            <input type="hidden" name="newStatus" id="input-@toggleId" value="@(u.Status == "active" ? "rejected" : "active")">
+                                            <div class="toggle-switch">
+                                                <input type="checkbox" id="@toggleId" @(u.Status == "active" ? "checked" : "")
+                                                       onchange="toggleConfirm(this, '@toggleId')">
+                                                <label for="@toggleId"></label>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
 
-            <!-- ===== DETAIL VIEW ===== -->
-            <div id="detailView" class="detail-view">
-                <h3>THÔNG TIN CHI TIẾT NGƯỜI DÙNG</h3>
-                <div class="detail-content">
-                    <div class="detail-column">
-                        <h4>THÔNG TIN CÁ NHÂN</h4>
-                        <div class="detail-item"><strong>Họ và tên:</strong> <span id="d-name"></span></div>
-                        <div class="detail-item"><strong>Email:</strong> <span id="d-email"></span></div>
-                        <div class="detail-item"><strong>Số điện thoại:</strong> <span id="d-phone"></span></div>
-                        <div class="detail-item"><strong>Số CCCD:</strong> <span id="d-cccd"></span></div>
-                        <div class="detail-item"><strong>Địa chỉ cá nhân:</strong> <span id="d-addr"></span></div>
-                        <div class="detail-item"><strong>Quyền:</strong> <span id="d-role"></span></div>
-                        <div class="detail-item"><strong>Trạng thái:</strong> <span id="d-status"></span></div>
-                    </div>
-                    <div class="detail-column" id="bizCol" style="display:none;">
-                        <h4>THÔNG TIN CƠ SỞ KINH DOANH</h4>
-                        <div class="detail-item"><strong>Tên cơ sở:</strong> Homestay Đà Lạt Xanh</div>
-                        <div class="detail-item"><strong>Loại hình:</strong> Homestay</div>
-                        <div class="detail-item"><strong>Địa chỉ kinh doanh:</strong> 45 Trần Phú, Đà Lạt</div>
-                        <div class="detail-item"><strong>Mô tả:</strong> Homestay view núi, không gian xanh mát.</div>
-                        <div class="detail-item"><strong>Thời gian:</strong> 07:00 - 22:00</div>
-                        <div class="detail-item"><strong>Trạng thái kinh doanh:</strong> active</div>
-                    </div>
-                </div>
-                <div style="text-align:center;">
-                    <a href="#" class="btn-back" onclick="hideDetail(); return false;">↩️ Quay lại danh sách</a>
-                </div>
+            @{
+                ViewData["CurrentPage"] = currentPage;
+                ViewData["TotalPages"] = totalPages;
+                ViewData["PageUrlBuilder"] = pageUrl;
+            }
+            @await Html.PartialAsync("Pagination", ViewData)
+
+            <div class="table-footer">
+                Tổng số: <strong>@totalCount.ToString("N0")</strong> người dùng
             </div>
         </main>
     </div>
 
     <script>
-        function showDetail(name, email, phone, cccd, addr, role, status, hasBiz) {
-            document.getElementById('listView').style.display = 'none';
-            document.getElementById('detailView').style.display = 'block';
-            document.getElementById('d-name').textContent = name;
-            document.getElementById('d-email').textContent = email;
-            document.getElementById('d-phone').textContent = phone;
-            document.getElementById('d-cccd').textContent = cccd;
-            document.getElementById('d-addr').textContent = addr;
-            document.getElementById('d-role').textContent = role;
-            const statusMap = { active: 'Hoạt động', pending: 'Chờ duyệt', rejected: 'Không hoạt động' };
-            const colorMap = { active: 'status-active', pending: 'status-pending', rejected: 'status-rejected' };
-            const el = document.getElementById('d-status');
-            el.textContent = statusMap[status] || status;
-            el.className = colorMap[status] || '';
-            document.getElementById('bizCol').style.display = hasBiz ? 'block' : 'none';
-        }
-        function hideDetail() {
-            document.getElementById('detailView').style.display = 'none';
-            document.getElementById('listView').style.display = 'block';
-        }
-        function toggleConfirm(checkbox) {
-            var newStatus = checkbox.checked ? 'active' : 'rejected';
-            if (!confirm('Xác nhận thay đổi trạng thái sang ' + newStatus + '?')) {
-                checkbox.checked = !checkbox.checked;
+                function toggleConfirm(checkbox, toggleId) {
+                const newStatus = checkbox.checked ? 'active' : 'rejected';
+                if (!confirm('Xác nhận thay đổi trạng thái sang ' + (newStatus === 'active' ? 'Hoạt động' : 'Không hoạt động') + '?')) {
+                    checkbox.checked = !checkbox.checked;
+                    return;
+                    }
+                document.getElementById('input-' + toggleId).value = newStatus;
+                document.getElementById('form-' + toggleId).submit();
             }
-        }
     </script>
 </body>
 </html>
