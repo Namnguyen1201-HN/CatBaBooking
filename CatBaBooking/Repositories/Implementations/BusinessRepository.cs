@@ -192,8 +192,6 @@ public class BusinessRepository : IBusinessRepository
             .FirstOrDefault(b => b.BusinessId == businessId && b.Type == "Restaurant");
     }
 
-}
-
     public Business? GetByOwnerId(int ownerId)
     {
         return _context.Businesses.FirstOrDefault(x => x.OwnerId == ownerId);
