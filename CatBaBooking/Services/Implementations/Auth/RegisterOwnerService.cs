@@ -1,3 +1,4 @@
+using CatBaBooking.Helpers;
 using CatBaBooking.Models;
 using CatBaBooking.Repository.Interface;
 using CatBaBooking.Service.Interface.Auth;
@@ -19,17 +20,9 @@ public class RegisterOwnerService : IRegisterOwnerService
         if (checkEmail) return null;
 
         var newUser = new User(
-            0,
-            roleId,
-            fullname,
-            email,
-            password, // Nhận password thô truyền từ Controller để Service lo mã hoá
-            phone,
-            citizen,
-            address,
-            "pending",
-            DateTime.Now,
-            DateTime.Now);
+    0, roleId, fullname, email,
+    PasswordHelper.HashPassword(password),
+    phone, citizen, address, "pending", DateTime.Now, DateTime.Now);
 
         return _userRepository.AddUser(newUser);
     }

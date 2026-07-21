@@ -35,10 +35,6 @@ public class ApproveApplicationService : IApproveApplicationService
         {
             return false;
         }
-
-        // Lưu ý: bảng businesses/users hiện chưa có cột lưu lý do từ chối,
-        // nên "reason" ở đây chỉ được validate là không rỗng, chưa được lưu vào DB.
-        // Nếu cần lưu lại, hãy thêm cột reject_reason (nullable) vào bảng businesses.
         return _approveApplicationRepository.UpdateBusinessAndOwnerStatus(businessId, "rejected", "rejected");
     }
 }
