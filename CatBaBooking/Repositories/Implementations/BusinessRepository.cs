@@ -13,6 +13,8 @@ public class BusinessRepository : IBusinessRepository
         _context = context;
     }
 
+    // NAMNS da o day
+
     public bool AnyBusinessByOwnerId(int ownerId)
     {
         return _context.Businesses.Any(x => x.OwnerId == ownerId);
