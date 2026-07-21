@@ -1,15 +1,17 @@
+using System.Collections.Generic;
 using CatBaBooking.Models;
-using Microsoft.EntityFrameworkCore;
+using CatBaBooking.Repository.Interface;
+using CatBaBooking.Service.Interface.Admin;
 
 namespace CatBaBooking.Service.Admin;
 
-public class UserManagementService
+public class UserManagementService : IUserManagementService
 {
-    private readonly CatbabookingContext con;
+    private readonly IUserManagementRepository _userManagementRepository;
 
-    public UserManagementService(CatbabookingContext con)
+    public UserManagementService(IUserManagementRepository userManagementRepository)
     {
-        this.con = con;
+        _userManagementRepository = userManagementRepository;
     }
 
     public (IEnumerable<User> Users, int TotalCount) GetPagedUsers(
@@ -19,32 +21,32 @@ public class UserManagementService
         int pageNumber,
         int pageSize)
     {
-        var query = con.Users.AsNoTracking().Include(u => u.Role)
-            .Where(u => u.RoleId != 3).AsQueryable();
-        if (!string.IsNullOrWhiteSpace(searchTerm))
-        {
-            string term = searchTerm.Trim().ToLower();
-            query = query.Where(u => u.Email.ToLower().Contains(term) || u.FullName.ToLower().Contains(term));
-        }
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
 
-        if (roleId.HasValue && roleId != 3)
-        {
-            query = query.Where(u => u.RoleId == roleId.Value);
-        }
+        string? normalizedStatus = string.IsNullOrWhiteSpace(status) || status == "all" ? null : status;
 
-        if (!string.IsNullOrWhiteSpace(status) && status != "Tất cả")
-        {
-            query = query.Where(u => u.Status == status);
-        }
-
-        query = query.OrderByDescending(u => u.UpdatedAt);
-        int totalCount = query.Count();
-        var users = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        var (users, totalCount) = _userManagementRepository.GetPagedUsers(searchTerm, roleId, normalizedStatus, pageNumber, pageSize);
         return (users, totalCount);
     }
 
-    // public bool ToggleUserStatus(int userId, string status)
-    // {
-    //     
-    // }
+    public User? GetUserById(int userId)
+    {
+        return _userManagementRepository.GetById(userId);
+    }
+
+    public bool ToggleUserStatus(int userId, string newStatus)
+    {
+        if (newStatus != "active" && newStatus != "rejected" && newStatus != "pending")
+        {
+            return false;
+        }
+
+        return _userManagementRepository.UpdateStatus(userId, newStatus);
+    }
+
+    public List<Role> GetAssignableRoles()
+    {
+        return _userManagementRepository.GetAssignableRoles();
+    }
 }

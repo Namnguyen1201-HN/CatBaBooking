@@ -63,24 +63,7 @@
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">Admin Panel</div>
-        <div class="user-info">
-            <div class="user-avatar">A</div>
-            <span class="user-name">Admin</span>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dash-board">Dashboard</a></li>
-            <li><a href="/booking-history">Lịch sử Booking</a></li>
-            <li><a href="/approve-application">Duyệt Yêu Cầu</a></li>
-            <li><a href="/user-management">Quản Lý Người Dùng</a></li>
-            <li class="active"><a href="/permissions-manager">Quản Lý Phân Quyền</a></li>
-            <li><a href="/feedback-management">Quản Lý Phản Hồi</a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button type="button" class="logout-btn">Đăng xuất</button>
-        </div>
-    </div>
+    @await Html.PartialAsync("AdminSidebar")
 
     <div class="main-content">
         <main>

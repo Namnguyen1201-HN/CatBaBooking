@@ -1,0 +1,76 @@
+@using CatBaBooking.Models
+@{
+    Layout = null;
+    Review review = ViewBag.Review;
+    string TypeLabel(string? t) => t == "homestay" ? "Homestay" : "Nhà hàng";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Chi Tiết Phản Hồi</title>
+    <link rel="stylesheet" href="~/css/Admin/admin-style.css">
+    <style>
+        .page-header { margin-bottom:20px; }
+        .page-header h1 { margin:0; font-size:26px; color:#0f172a; }
+        .card { background:#fff; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 8px 24px rgba(15,23,42,0.06); padding:24px; }
+        .detail-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; margin-bottom:24px; }
+        .detail-section { background:#f8fafc; border-radius:10px; padding:18px; border:1px solid #e2e8f0; }
+        .detail-section h3 { margin:0 0 12px; color:#0f172a; font-size:15px; text-transform:uppercase; letter-spacing:.05em; }
+        .detail-item { margin-bottom:10px; color:#475569; font-size:14px; }
+        .detail-item strong { color:#0f172a; }
+        .rating-badge { display:inline-block; padding:4px 12px; background:#fef3c7; color:#b45309; border-radius:999px; font-weight:700; font-size:14px; }
+        .comment-box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:18px; margin-bottom:24px; color:#334155; font-size:14px; line-height:1.6; white-space:pre-wrap; }
+        .actions { display:flex; gap:10px; flex-wrap:wrap; }
+        .btn { border:none; padding:10px 18px; border-radius:6px; font-size:14px; cursor:pointer; font-weight:600; text-decoration:none; display:inline-block; }
+        .btn-back { background:#e2e8f0; color:#1f2937; }
+        .btn-delete { background:#dc2626; color:#fff; }
+    </style>
+</head>
+<body>
+    @await Html.PartialAsync("AdminSidebar")
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1>Chi tiết phản hồi #@review.ReviewId</h1>
+            <p style="color:#64748b; margin-top:6px;">Xem đầy đủ nội dung đánh giá và thông tin liên quan.</p>
+        </div>
+        <main>
+            <div class="card">
+                <div class="detail-grid">
+                    <div class="detail-section">
+                        <h3>Người đánh giá</h3>
+                        <div class="detail-item"><strong>Họ và tên:</strong> @(review.User?.FullName ?? "")</div>
+                        <div class="detail-item"><strong>Email:</strong> @(review.User?.Email ?? "")</div>
+                        <div class="detail-item"><strong>Số điện thoại:</strong> @(review.User?.Phone ?? "")</div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>Cơ sở được đánh giá</h3>
+                        <div class="detail-item"><strong>Tên cơ sở:</strong> @(review.Business?.Name ?? "")</div>
+                        <div class="detail-item"><strong>Loại hình:</strong> @TypeLabel(review.Business?.Type)</div>
+                        <div class="detail-item"><strong>Địa chỉ:</strong> @(review.Business?.Address ?? "")</div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>Thông tin đánh giá</h3>
+                        <div class="detail-item"><strong>Đánh giá:</strong> <span class="rating-badge">@review.Rating ⭐</span></div>
+                        <div class="detail-item"><strong>Ngày gửi:</strong> @(review.CreatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "")</div>
+                        <div class="detail-item"><strong>Mã booking liên quan:</strong> @(review.Booking?.BookingCode ?? "Không có")</div>
+                    </div>
+                </div>
+
+                <h3 style="color:#0f172a; font-size:15px; margin-bottom:10px;">Nội dung phản hồi</h3>
+                <div class="comment-box">@(string.IsNullOrWhiteSpace(review.Comment) ? "(Không có nội dung)" : review.Comment)</div>
+
+                <div class="actions">
+                    <a href="/feedback-management" class="btn btn-back">Quay lại danh sách</a>
+                    <form method="post" action="/feedback-management/@review.ReviewId/delete">
+                        <button type="submit" class="btn btn-delete" onclick="return confirm('Bạn có chắc muốn xóa phản hồi này?')">Xóa phản hồi</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

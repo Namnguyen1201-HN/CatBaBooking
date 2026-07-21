@@ -1,6 +1,26 @@
-
+@using CatBaBooking.Models
 @{
     Layout = null;
+
+    List<Review> reviews = ViewBag.Reviews ?? new List<Review>();
+    int totalCount = ViewBag.TotalCount;
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+
+    string? search = ViewBag.Search;
+    int? rating = ViewBag.Rating;
+    string? sort = ViewBag.Sort;
+
+    string TypeLabel(string? t) => t == "homestay" ? "Homestay" : "Nhà hàng";
+
+    Func<int, string> pageUrl = p =>
+    {
+        var parts = new List<string> { $"page={p}" };
+        if (!string.IsNullOrEmpty(search)) parts.Add($"search={Uri.EscapeDataString(search)}");
+        if (rating.HasValue) parts.Add($"rating={rating}");
+        if (!string.IsNullOrEmpty(sort)) parts.Add($"sort={Uri.EscapeDataString(sort)}");
+        return "/feedback-management?" + string.Join("&", parts);
+    };
 }
 
 <!DOCTYPE html>
@@ -18,73 +38,70 @@
         .feedback-table tbody tr:nth-child(even) { background:#f8fafc; }
         .btn { border:none; padding:7px 12px; border-radius:4px; font-size:13px; cursor:pointer; }
         .btn-delete { background:#dc2626; color:#fff; }
+        .btn-view { background:#3b82f6; color:#fff; text-decoration:none; display:inline-flex; align-items:center; }
         .message { margin:16px 0; padding:10px 14px; border-radius:6px; font-size:14px; }
         .message-success { background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; }
+        .message-error { background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; }
         .empty-row { text-align:center; padding:32px 0; color:#6b7280; }
         .filter-wrap { background:#fff; padding:20px; border-radius:8px; margin-bottom:20px; border:1px solid #e5e7eb; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; align-items:end; }
         .filter-wrap > div { display:flex; flex-direction:column; }
         .filter-wrap label { display:block; margin-bottom:6px; font-size:13px; color:#475569; font-weight:500; }
         .filter-wrap input, .filter-wrap select { width:100%; padding:8px 12px; border:1px solid #e5e7eb; border-radius:4px; font-size:14px; box-sizing:border-box; }
         .filter-wrap button { width:100%; padding:8px 16px; background:#3b82f6; color:#fff; border:none; border-radius:4px; font-size:14px; font-weight:500; cursor:pointer; }
-        .pagination-wrap { display:flex; justify-content:center; align-items:center; gap:8px; margin-top:24px; }
-        .pagination-wrap a, .pagination-wrap span { padding:8px 12px; border:1px solid #e5e7eb; border-radius:4px; text-decoration:none; color:#334155; font-size:14px; }
-        .pagination-wrap .cur { background:#3b82f6; color:#fff; }
         .table-footer { padding:16px; background:#f8fafc; border-top:1px solid #e5e7eb; color:#64748b; font-size:14px; margin-top:20px; border-radius:0 0 8px 8px; }
         td.comment-cell { max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .pagination { display:flex; justify-content:center; align-items:center; gap:8px; margin-top:20px; }
+        .pagination a, .pagination span { padding:8px 12px; border:1px solid #e2e8f0; border-radius:6px; text-decoration:none; color:#334155; font-size:14px; }
+        .pagination a:hover { background:#f8fafc; }
+        .pagination .current { background:#3b82f6; color:#fff; border-color:#3b82f6; }
+        .pagination .disabled { color:#cbd5e1; pointer-events:none; }
+        .pagination .ellipsis { border:none; }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">Admin Panel</div>
-        <div class="user-info">
-            <div class="user-avatar">A</div>
-            <span class="user-name">Admin</span>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dash-board">Dashboard</a></li>
-            <li><a href="/booking-history">Lịch sử Booking</a></li>
-            <li><a href="/approve-application">Duyệt Yêu Cầu</a></li>
-            <li><a href="/user-management">Quản Lý Người Dùng</a></li>
-            <li><a href="/permissions-manager">Quản Lý Phân Quyền</a></li>
-            <li class="active"><a href="/feedback-management">Quản Lý Phản Hồi</a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button type="button" class="logout-btn">Đăng xuất</button>
-        </div>
-    </div>
+    @await Html.PartialAsync("AdminSidebar")
 
     <div class="main-content">
         <div class="feedback-wrapper">
             <h1>Quản lí Feedback</h1>
 
-            <div class="filter-wrap">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="message message-success">@TempData["SuccessMessage"]</div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="message message-error">@TempData["ErrorMessage"]</div>
+            }
+
+            <form class="filter-wrap" method="get" action="/feedback-management">
                 <div>
                     <label>Tìm kiếm</label>
-                    <input type="text" placeholder="Tên cơ sở, người dùng, nội dung...">
+                    <input type="text" name="search" value="@search" placeholder="Tên cơ sở, người dùng, nội dung...">
                 </div>
                 <div>
                     <label>Đánh giá</label>
-                    <select>
-                        <option value="">Tất cả</option>
-                        <option value="5">5 sao</option>
-                        <option value="4">4 sao</option>
-                        <option value="3">3 sao</option>
-                        <option value="2">2 sao</option>
-                        <option value="1">1 sao</option>
+                    <select name="rating">
+                        <option value="" selected="@(!rating.HasValue)">Tất cả</option>
+                        <option value="5" selected="@(rating == 5)">5 sao</option>
+                        <option value="4" selected="@(rating == 4)">4 sao</option>
+                        <option value="3" selected="@(rating == 3)">3 sao</option>
+                        <option value="2" selected="@(rating == 2)">2 sao</option>
+                        <option value="1" selected="@(rating == 1)">1 sao</option>
                     </select>
                 </div>
                 <div>
                     <label>Sắp xếp</label>
-                    <select>
-                        <option value="">Mới nhất</option>
-                        <option value="rating_desc">Đánh giá cao → thấp</option>
-                        <option value="rating_asc">Đánh giá thấp → cao</option>
+                    <select name="sort">
+                        <option value="" selected="@(string.IsNullOrEmpty(sort))">Mới nhất</option>
+                        <option value="rating_desc" selected="@(sort == "rating_desc")">Đánh giá cao → thấp</option>
+                        <option value="rating_asc" selected="@(sort == "rating_asc")">Đánh giá thấp → cao</option>
                     </select>
                 </div>
                 <div>
-                    <button type="button">Lọc</button>
+                    <button type="submit">Lọc</button>
                 </div>
-            </div>
+            </form>
 
             <table class="feedback-table">
                 <thead>
@@ -100,69 +117,47 @@
                     </tr>
                 </thead>
                 <tbody>
+                @if (!reviews.Any())
+                {
                     <tr>
-                        <td>1</td>
-                        <td>Nguyễn Văn An</td>
-                        <td>Homestay Đà Lạt Xanh</td>
-                        <td>Homestay</td>
-                        <td class="comment-cell">Phòng sạch sẽ, view đẹp, nhân viên thân thiện. Rất hài lòng!</td>
-                        <td>5 sao</td>
-                        <td>01/06/2025</td>
-                        <td><button class="btn btn-delete" onclick="return confirm('Bạn có chắc muốn xóa phản hồi này?')">Xóa</button></td>
+                        <td colspan="8" class="empty-row">Không tìm thấy phản hồi nào.</td>
                     </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Trần Thị Bình</td>
-                        <td>Nhà hàng Phố Cổ</td>
-                        <td>Nhà hàng</td>
-                        <td class="comment-cell">Món ăn ngon, không gian đẹp nhưng giá hơi cao.</td>
-                        <td>4 sao</td>
-                        <td>03/06/2025</td>
-                        <td><button class="btn btn-delete" onclick="return confirm('Bạn có chắc muốn xóa phản hồi này?')">Xóa</button></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Lê Minh Cường</td>
-                        <td>Villa Sapa Mist</td>
-                        <td>Homestay</td>
-                        <td class="comment-cell">Phòng hơi lạnh, thiếu chăn, nhưng view cực đẹp và chủ nhiệt tình.</td>
-                        <td>3 sao</td>
-                        <td>05/06/2025</td>
-                        <td><button class="btn btn-delete" onclick="return confirm('Bạn có chắc muốn xóa phản hồi này?')">Xóa</button></td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Phạm Thu Dung</td>
-                        <td>Quán Ăn Bà Ngoại</td>
-                        <td>Nhà hàng</td>
-                        <td class="comment-cell">Cơm ngon như nhà nấu, giá cả phải chăng. Sẽ quay lại!</td>
-                        <td>5 sao</td>
-                        <td>06/06/2025</td>
-                        <td><button class="btn btn-delete" onclick="return confirm('Bạn có chắc muốn xóa phản hồi này?')">Xóa</button></td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>Hoàng Quốc Việt</td>
-                        <td>Homestay Hội An Garden</td>
-                        <td>Homestay</td>
-                        <td class="comment-cell">Dịch vụ tệ, phòng không như quảng cáo. Rất thất vọng.</td>
-                        <td>1 sao</td>
-                        <td>07/06/2025</td>
-                        <td><button class="btn btn-delete" onclick="return confirm('Bạn có chắc muốn xóa phản hồi này?')">Xóa</button></td>
-                    </tr>
+                }
+                else
+                {
+                    @foreach (var r in reviews)
+                    {
+                        <tr>
+                            <td>@r.ReviewId</td>
+                            <td>@(r.User?.FullName ?? "")</td>
+                            <td>@(r.Business?.Name ?? "")</td>
+                            <td>@TypeLabel(r.Business?.Type)</td>
+                            <td class="comment-cell" title="@r.Comment">@(r.Comment ?? "")</td>
+                            <td>@r.Rating sao</td>
+                            <td>@(r.CreatedAt?.ToString("dd/MM/yyyy") ?? "")</td>
+                            <td>
+                                <div style="display:flex; gap:8px;">
+                                    <a class="btn btn-view" href="/feedback-management/@r.ReviewId">Chi tiết</a>
+                                    <form method="post" action="/feedback-management/@r.ReviewId/delete">
+                                        <button type="submit" class="btn btn-delete" onclick="return confirm('Bạn có chắc muốn xóa phản hồi này?')">Xóa</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
                 </tbody>
             </table>
 
-            <div class="pagination-wrap">
-                <span style="color:#999;">« Trước</span>
-                <span class="cur">1</span>
-                <a href="#">2</a>
-                <a href="#">3</a>
-                <a href="#">Sau »</a>
-            </div>
+            @{
+                ViewData["CurrentPage"] = currentPage;
+                ViewData["TotalPages"] = totalPages;
+                ViewData["PageUrlBuilder"] = pageUrl;
+            }
+            @await Html.PartialAsync("Pagination", ViewData)
 
             <div class="table-footer">
-                Tổng số: <strong>47</strong> phản hồi
+                Tổng số: <strong>@totalCount.ToString("N0")</strong> phản hồi
             </div>
         </div>
     </div>

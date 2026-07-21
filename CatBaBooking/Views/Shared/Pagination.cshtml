@@ -1,0 +1,47 @@
+@using CatBaBooking.Helpers
+@{
+    int currentPage = (int)(ViewData["CurrentPage"] ?? 1);
+    int totalPages = (int)(ViewData["TotalPages"] ?? 0);
+    var buildUrl = (Func<int, string>)ViewData["PageUrlBuilder"]!;
+
+    var pageItems = PaginationHelper.BuildPageItems(currentPage, totalPages);
+}
+
+@if (totalPages > 1)
+{
+    <div class="pagination">
+        @if (currentPage > 1)
+        {
+            <a href="@buildUrl(currentPage - 1)">« Trước</a>
+        }
+        else
+        {
+            <span class="disabled">« Trước</span>
+        }
+
+        @foreach (var item in pageItems)
+        {
+            if (item == "...")
+            {
+                <span class="ellipsis">…</span>
+            }
+            else if (int.Parse(item) == currentPage)
+            {
+                <span class="current">@item</span>
+            }
+            else
+            {
+                <a href="@buildUrl(int.Parse(item))">@item</a>
+            }
+        }
+
+        @if (currentPage < totalPages)
+        {
+            <a href="@buildUrl(currentPage + 1)">Sau »</a>
+        }
+        else
+        {
+            <span class="disabled">Sau »</span>
+        }
+    </div>
+}
