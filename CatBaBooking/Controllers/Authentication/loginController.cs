@@ -37,14 +37,15 @@ public class loginController : Controller
         HttpContext.Session.SetString("RoleId", user.RoleId.ToString());
         HttpContext.Session.SetString("RoleName", user.Role.RoleName);
         string? role = HttpContext.Session.GetString("RoleName");
+
         switch (role?.ToLower().Trim())
         {
             case "admin":
                 return Redirect("/dash-board");
-            case "ownerhomestay":
-                return Redirect("/dash-board");
-            case "ownerrestaurant":
-                return Redirect("/dash-board");
+            case "owner homestay":
+            case "owner restaurant":
+                // Owner (nhà hàng hoặc homestay) vào thẳng trang quản lý Owner
+                return RedirectToAction("OwnerDashboard", "OwnerDashboard");
             default:
                 return Redirect("/home-page");
         }

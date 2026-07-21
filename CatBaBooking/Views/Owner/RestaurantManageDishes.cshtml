@@ -1,0 +1,479 @@
+﻿@model CatBaBooking.ViewModels.RestaurantManageDishesViewModel
+@{
+    // Ẩn Layout mặc định của ASP.NET Core để dùng Full màn hình
+    Layout = null; 
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Owner - Quản lý Món ăn</title>     
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <style>
+        /* ================= BỐ CỤC CHUNG ================= */
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fc;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            align-items: stretch;
+        }
+
+        /* ----- SIDEBAR ----- */
+        .sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background-color: #0e6b53;
+            color: #ffffff;
+            min-height: 100vh;
+            transition: all 0.3s;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-brand {
+            text-align: center;
+            padding: 20px 10px;
+            color: #fff;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand h5 {
+            font-weight: 700; margin: 0; font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        .sidebar-brand span { font-size: 0.8rem; font-weight: normal; display: block; margin-top: 5px; opacity: 0.8; }
+        .sidebar .nav-item { margin-bottom: 5px; }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px; font-weight: 500; display: flex; align-items: center;
+            border-left: 4px solid transparent; text-decoration: none;
+        }
+        .sidebar .nav-link i { margin-right: 15px; font-size: 1.2rem; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #ffffff; background-color: rgba(255, 255, 255, 0.1); border-left: 4px solid #fff;
+        }
+        .logout-item { margin-top: auto; margin-bottom: 20px; }
+
+        /* ----- MAIN CONTENT & HEADER ----- */
+        .main-content {
+            flex-grow: 1; display: flex; flex-direction: column;
+            min-width: 0; height: 100vh; overflow-y: auto;
+        }
+
+        .header {
+            background: #fff; padding: 15px 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #eee; position: relative;
+        }
+
+        #sidebar-toggle {
+            background: none; border: 1px solid #ddd; border-radius: 4px;
+            padding: 5px 10px; font-size: 1.2rem; color: #333; cursor: pointer;
+        }
+
+        .header-title {
+            color: #0e6b53; font-weight: 600; font-size: 1.3rem; margin: 0;
+            position: absolute; left: 50%; transform: translateX(-50%);
+        }
+
+        .user-info { font-weight: 500; color: #333; }
+        
+        #sidebar-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 999; display: none;
+        }
+
+        @@media (max-width: 768px) {
+            .sidebar { position: fixed; margin-left: -250px; }
+            .sidebar.active { margin-left: 0; }
+            .header-title { display: none; }
+        }
+
+        /* ================= CỤ THỂ TRANG MÓN ĂN ================= */
+        .dish-thumbnail {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        /* Chỉnh lại màu nút primary cho giống tone xanh */
+        .btn-primary { background-color: #0e6b53; border-color: #0e6b53; }
+        .btn-primary:hover { background-color: #0b5643; border-color: #0b5643; }
+        .btn-outline-primary { color: #0e6b53; border-color: #0e6b53; }
+        .btn-outline-primary:hover { background-color: #0e6b53; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        
+        <!-- SIDEBAR -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <h5>🚢 Cát Bà Booking</h5>
+                <span>Owner Dashboard</span>
+            </div>
+            
+            <ul class="nav flex-column mt-3 w-100">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="OwnerDashboard" asp-action="OwnerDashboard">
+                        <i class="bi bi-houses-fill text-warning"></i> Tổng quan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="RestaurantProfile" asp-action="RestaurantProfile">
+                        <i class="bi bi-shop text-warning"></i> Thông tin Restaurant
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" asp-controller="RestaurantManageDishes" asp-action="RestaurantManageDishes">
+                        <i class="bi bi-egg-fried text-light"></i> Quản lý Món ăn
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="RestaurantBookings" asp-action="RestaurantBookings">
+                        <i class="bi bi-calendar-check text-light"></i> Lịch sử Đặt bàn
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="RestaurantManageTables" asp-action="RestaurantManageTables">
+                        <i class="bi bi-grid-3x3 text-light"></i> Quản lý Bàn
+                    </a>
+                </li>
+                <li class="nav-item logout-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-box-arrow-right text-light"></i> Đăng xuất
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="sidebar-overlay"></div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <header class="header">
+                <button id="sidebar-toggle"><i class="bi bi-list"></i></button>
+                <h1 class="header-title">Quản lý Món ăn</h1>
+                <div class="user-info">
+                    <i class="bi bi-bell me-3 text-muted"></i>
+                    @Model.RestaurantName
+                </div>
+            </header>
+
+            <main class="content p-4">
+                <div class="container-fluid p-0">
+                    
+                    <h2 class="mb-3 text-primary fw-bold" style="color: #0d6efd !important;">Quản lý Món ăn</h2>
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <!-- Form thêm món ăn mới -->
+                    <div class="card shadow-sm mb-4 border-0">
+                        <div class="card-header bg-white py-3 border-bottom-0">
+                            <h5 class="mb-0 fw-bold text-dark">Thêm món ăn mới</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" asp-controller="RestaurantManageDishes" asp-action="AddDish" enctype="multipart/form-data">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Tên món</label>
+                                        <input name="name" class="form-control" required placeholder="Nhập tên món..." />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold">Giá (đ)</label>
+                                        <input name="price" type="number" min="0" step="1000" class="form-control" required placeholder="0" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold">Danh mục</label>
+                                        <select name="category_id" class="form-select" required>
+                                            <option value="">-- Chọn danh mục --</option>
+                                            @foreach (var cat in Model.Categories)
+                                            {
+                                                <option value="@cat.CategoryId">@cat.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Mô tả</label>
+                                        <textarea name="description" class="form-control" rows="2" placeholder="Mô tả ngắn gọn về món ăn..."></textarea>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <label class="form-label fw-semibold">Ảnh minh họa</label>
+                                        <input name="dish_image_file" type="file" class="form-control" accept="image/*" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold">Trạng thái</label>
+                                        <select name="is_active" class="form-select">
+                                            <option value="true">Đang bán</option>
+                                            <option value="false">Ngừng bán</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12 d-flex justify-content-end gap-2 mt-4">
+                                        <button class="btn btn-primary px-4 py-2" type="submit">
+                                            <i class="bi bi-plus-circle me-1"></i> Lưu món
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Danh sách món ăn (Cột trái to hơn) -->
+                        <div class="col-lg-8">
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-header bg-white py-3">
+                                    <h5 class="mb-0 fw-bold text-dark">Danh sách món ăn</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle mb-0" id="dishTable">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th scope="col" class="ps-4 py-3">STT</th>
+                                                    <th scope="col" class="py-3">Món ăn</th>
+                                                    <th scope="col" class="py-3">Giá</th>
+                                                    <th scope="col" class="py-3">Danh mục</th>
+                                                    <th scope="col" class="py-3">Trạng thái</th>
+                                                    <th scope="col" class="text-end pe-4 py-3">Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (!Model.Dishes.Any())
+                                                {
+                                                    <tr><td colspan="6" class="text-center text-muted py-4">Chưa có món ăn nào.</td></tr>
+                                                }
+                                                else
+                                                {
+                                                    foreach (var dish in Model.Dishes)
+                                                    {
+                                                        <tr>
+                                                            <td class="ps-4 fw-bold text-secondary"></td>
+                                                            <td>
+                                                                <img src="@(string.IsNullOrEmpty(dish.ImageUrl) ? "https://placehold.co/100x100?text=Food" : dish.ImageUrl)"
+                                                                     alt="@dish.Name" class="dish-thumbnail">
+                                                                <strong>@dish.Name</strong>
+                                                            </td>
+                                                            <td class="fw-bold text-danger">@dish.Price.ToString("N0") ₫</td>
+                                                            <td>@dish.CategoryName</td>
+                                                            <td>
+                                                                @if (dish.IsAvailable)
+                                                                {
+                                                                    <span class="badge bg-success">Đang bán</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="badge bg-secondary">Ngừng bán</span>
+                                                                }
+                                                            </td>
+                                                            <td class="text-end pe-4">
+                                                                <button type="button" class="btn btn-warning btn-sm edit-btn text-dark"
+                                                                        data-bs-toggle="modal" 
+                                                                        data-bs-target="#editDishModal"
+                                                                        data-id="@dish.DishId" data-name="@dish.Name" data-price="@dish.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                                                        data-category-id="@dish.CategoryId" data-description="@dish.Description"
+                                                                        data-image-url="@dish.ImageUrl" data-active="@dish.IsAvailable.ToString().ToLower()">
+                                                                    <i class="bi bi-pencil-square"></i> Sửa
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Danh mục (Cột phải nhỏ hơn) -->
+                        <div class="col-lg-4">
+                            <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0 fw-bold text-dark">Danh mục</h5>
+                                </div>
+                                <div class="card-body bg-light border-bottom">
+                                    <form method="post" asp-controller="RestaurantManageDishes" asp-action="AddCategory" class="d-flex gap-2">
+                                        <input name="name" class="form-control form-control-sm" placeholder="Thêm danh mục mới..." required />
+                                        <button class="btn btn-sm btn-outline-primary" type="submit">Thêm</button>
+                                    </form>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @if (!Model.Categories.Any())
+                                        {
+                                            <span class="text-muted small">Chưa có danh mục nào.</span>
+                                        }
+                                        else
+                                        {
+                                            foreach (var cat in Model.Categories)
+                                            {
+                                                <span class="badge rounded-pill bg-white text-dark border p-2 px-3 shadow-sm">@cat.Name</span>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal chỉnh sửa -->
+    <div class="modal fade" id="editDishModal" tabindex="-1" aria-labelledby="editDishModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow">
+                <form method="post" asp-controller="RestaurantManageDishes" asp-action="UpdateDish" enctype="multipart/form-data">
+                    <div class="modal-header bg-light">
+                        <h5 class="modal-title fw-bold" id="editDishModalLabel">Chỉnh sửa món ăn</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <input type="hidden" name="dish_id" id="editDishId">
+                        <input type="hidden" name="existing_image_url" id="editExistingImageUrl">
+
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="editName" class="form-label fw-semibold">Tên món</label>
+                                <input type="text" class="form-control" id="editName" name="name" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editPrice" class="form-label fw-semibold">Giá (đ)</label>
+                                <input type="number" class="form-control" id="editPrice" name="price" min="0" step="1000" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="editDescription" class="form-label fw-semibold">Mô tả</label>
+                                <textarea class="form-control" id="editDescription" name="description" rows="2"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label for="editDishImageFile" class="form-label fw-semibold">Tải lên ảnh mới (Bỏ trống nếu giữ nguyên)</label>
+                                <input type="file" class="form-control" id="editDishImageFile" name="dish_image_file" accept="image/*">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editCategoryId" class="form-label fw-semibold">Danh mục</label>
+                                <select id="editCategoryId" name="category_id" class="form-select" required>
+                                    @foreach (var cat in Model.Categories)
+                                    {
+                                        <option value="@cat.CategoryId">@cat.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editIsActive" class="form-label fw-semibold">Trạng thái</label>
+                                <select id="editIsActive" name="is_active" class="form-select" required>
+                                    <option value="true">Đang bán</option>
+                                    <option value="false">Ngừng bán</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>               
+        </div>           
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Logic Sidebar (Mobile)
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('sidebar-toggle');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if(toggle) {
+                toggle.addEventListener('click', () => { 
+                    sidebar.classList.add('active'); 
+                    overlay.style.display = 'block'; 
+                });
+            }
+            if(overlay) {
+                overlay.addEventListener('click', () => { 
+                    sidebar.classList.remove('active'); 
+                    overlay.style.display = 'none'; 
+                });
+            }
+
+            // Modal điền dữ liệu
+            const editButtons = document.querySelectorAll('.edit-btn');
+            editButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.getAttribute('data-id');
+                    const name = this.getAttribute('data-name');
+                    const price = this.getAttribute('data-price');
+                    const categoryId = this.getAttribute('data-category-id');
+                    const description = this.getAttribute('data-description');
+                    const imageUrl = this.getAttribute('data-image-url');
+                    const active = this.getAttribute('data-active');
+                    
+                    document.getElementById('editDishId').value = id;
+                    document.getElementById('editName').value = name;
+                    document.getElementById('editPrice').value = price;
+                    
+                    const catSelect = document.getElementById('editCategoryId');
+                    if (catSelect.querySelector(`option[value="${categoryId}"]`)) {
+                        catSelect.value = categoryId;
+                    }
+                    
+                    document.getElementById('editDescription').value = description;
+                    
+                    // Xử lý giá trị true/false cho dropdown trạng thái
+                    const activeSelect = document.getElementById('editIsActive');
+                    if(active === 'true' || active === 'True') activeSelect.value = "true";
+                    else if(active === 'false' || active === 'False') activeSelect.value = "false";
+
+                    document.getElementById('editExistingImageUrl').value = imageUrl || '';
+                    document.getElementById('editDishImageFile').value = ""; // Xóa file cũ trong input
+                });
+            });
+
+            // Gán số thứ tự cho cột đầu tiên (Cột STT)
+            const rows = document.querySelectorAll("#dishTable tbody tr");
+            rows.forEach((row, index) => {
+                const firstCell = row.querySelector("td:first-child");
+                if (firstCell) {
+                    firstCell.textContent = index + 1;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
