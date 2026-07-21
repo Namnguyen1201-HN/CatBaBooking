@@ -1,9 +1,15 @@
 ﻿using CatBaBooking.Models;
+using System.Collections.Generic;
 
+namespace CatBaBooking.Repositories.Interfaces
+{
 namespace CatBaBooking.Repository.Interface;
 
-public interface IBookingRepository
-{
+    public interface IBookingRepository
+    {
+        Booking? CreateBooking(Booking booking, List<BookingDish> dishes);
+        Booking? GetBookingByCode(string bookingCode);
+    }
     // Lấy toàn bộ booking thuộc về 1 business (dùng cho Owner quản lý)
     List<Booking> GetByBusinessId(int businessId);
 

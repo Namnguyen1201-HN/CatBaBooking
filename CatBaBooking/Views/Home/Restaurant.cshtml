@@ -1,5 +1,4 @@
-
-
+@model CatBaBooking.ViewModels.Restaurant.RestaurantListViewModel
 @{
     Layout = null;
 }
@@ -34,127 +33,144 @@
 <body>
     @await Html.PartialAsync("Sidebar")
 
-    <form action="/restaurant-page" method="GET" id="restaurant-search-form">
-        <section class="hero">
-            <div class="hero-overlay"></div><div class="hero-bg"></div>
-            <div class="container"><div class="hero-content">
-                <div class="hero-text"><h1>Nhà hàng tại Cát Bà</h1><p>Khám phá ẩm thực đặc sắc và đặt bàn trực tuyến</p></div>
-                <div class="search-forms"><div class="search-form active">
-                    <div class="form-tabs">
-                        <button type="button" class="form-tab active"><i class="fas fa-utensils"></i><span>Tất cả</span></button>
-                        <button type="button" class="form-tab"><span>Hải sản</span></button>
-                        <button type="button" class="form-tab"><span>Món Việt</span></button>
-                        <button type="button" class="form-tab"><span>BBQ</span></button>
-                    </div>
-                    <div class="form-grid" style="display:flex;flex-wrap:wrap;gap:15px;align-items:end;">
-                        <div class="form-field" style="flex:0 0 200px;"><label>Loại hình</label><div class="input-wrapper"><i class="fas fa-utensils"></i><select name="restaurantType" class="form-select"><option value="">Loại nhà hàng</option><option value="1">Hải sản</option><option value="2">Món Việt</option><option value="3">BBQ</option></select></div></div>
-                        <div class="form-field" style="flex:0 0 220px;"><label>Khu vực</label><div class="input-wrapper"><i class="fas fa-map-marker-alt"></i><select name="areaId" class="form-select"><option value="0">Chọn khu vực</option><option value="1">Cát Cò 1</option><option value="2">Trung tâm</option></select></div></div>
-                        <div class="form-field" style="flex:0 0 180px;"><label>Ngày đặt bàn</label><div class="input-wrapper"><i class="fas fa-calendar"></i><input type="date" name="date" class="form-input"></div></div>
-                        <div class="form-field" style="flex:0 0 150px;"><label>Giờ</label><div class="input-wrapper"><i class="fas fa-clock"></i><input type="time" name="time" class="form-input"></div></div>
-                        <div class="form-field" style="flex:0 0 100px;"><label>Số người</label><div class="input-wrapper"><i class="fas fa-users"></i><input type="number" name="numGuests" class="form-input" min="1"></div></div>
-                        <div class="form-field" style="flex:0 0 150px;"><button type="submit" class="search-btn"><i class="fas fa-search"></i> Tìm nhà hàng</button></div>
-                    </div>
-                </div></div>
-            </div></div>
-        </section>
+    <section class="hero">
+        <div class="hero-overlay"></div><div class="hero-bg"></div>
+        <div class="container"><div class="hero-content">
+            <div class="hero-text"><h1>Nhà hàng tại Cát Bà</h1><p>Khám phá ẩm thực đặc sắc và đặt bàn trực tuyến</p></div>
+        </div></div>
+    </section>
 
         <div class="container"><div class="main-content"><div class="content-layout">
             <div class="sidebar">
-                <div class="filter-section">
+                <form id="filterForm" action="/restaurant-page" method="GET" class="filter-section">
                     <div class="filter-header"><i class="fas fa-sliders-h"></i><h3>Bộ lọc</h3></div>
+                    
+                    <div class="filter-group">
+                        <h4>Khu vực</h4>
+                        <div class="filter-options">
+                            <label class="filter-option"><input type="radio" name="areaId" value="0" @(Model.AreaId == null || Model.AreaId == 0 ? "checked" : "")><span>Tất cả khu vực</span></label>
+                            <label class="filter-option"><input type="radio" name="areaId" value="1" @(Model.AreaId == 1 ? "checked" : "")><span>TT.Cát Bà</span></label>
+                            <label class="filter-option"><input type="radio" name="areaId" value="2" @(Model.AreaId == 2 ? "checked" : "")><span>Trung tâm Cát Bà</span></label>
+                            <label class="filter-option"><input type="radio" name="areaId" value="3" @(Model.AreaId == 3 ? "checked" : "")><span>Vườn quốc gia Cát Bà</span></label>
+                            <label class="filter-option"><input type="radio" name="areaId" value="4" @(Model.AreaId == 4 ? "checked" : "")><span>Làng Việt Hải</span></label>
+                            <label class="filter-option"><input type="radio" name="areaId" value="5" @(Model.AreaId == 5 ? "checked" : "")><span>Bến Bèo</span></label>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h4>Loại hình</h4>
+                        <div class="filter-options">
+                            <label class="filter-option"><input type="radio" name="restaurantType" value="" @(string.IsNullOrEmpty(Model.RestaurantType) ? "checked" : "")><span>Tất cả</span></label>
+                            <label class="filter-option"><input type="radio" name="restaurantType" value="1" @(Model.RestaurantType == "1" ? "checked" : "")><span>Nhà hàng hải sản</span></label>
+                            <label class="filter-option"><input type="radio" name="restaurantType" value="2" @(Model.RestaurantType == "2" ? "checked" : "")><span>Quán ăn địa phương</span></label>
+                            <label class="filter-option"><input type="radio" name="restaurantType" value="3" @(Model.RestaurantType == "3" ? "checked" : "")><span>Nướng BBQ</span></label>
+                            <label class="filter-option"><input type="radio" name="restaurantType" value="4" @(Model.RestaurantType == "4" ? "checked" : "")><span>Lẩu</span></label>
+                        </div>
+                    </div>
+
                     <div class="filter-group">
                         <h4>Đánh giá</h4>
                         <div class="filter-options">
-                            <label class="filter-option"><input type="checkbox" name="minRating" value="5"><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span>5 sao</span></div></label>
-                            <label class="filter-option"><input type="checkbox" name="minRating" value="4"><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span>4+ sao</span></div></label>
-                            <label class="filter-option"><input type="checkbox" name="minRating" value="3"><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div><span>3+ sao</span></div></label>
+                            <label class="filter-option"><input type="checkbox" name="minRating" value="5" @(Model.MinRating != null && Model.MinRating.Contains(5) ? "checked" : "")><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span>5 sao</span></div></label>
+                            <label class="filter-option"><input type="checkbox" name="minRating" value="4" @(Model.MinRating != null && Model.MinRating.Contains(4) ? "checked" : "")><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span>4+ sao</span></div></label>
+                            <label class="filter-option"><input type="checkbox" name="minRating" value="3" @(Model.MinRating != null && Model.MinRating.Contains(3) ? "checked" : "")><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div><span>3+ sao</span></div></label>
                         </div>
                     </div>
-                    <button type="submit" class="apply-filter-btn">Áp dụng bộ lọc</button>
-                </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="apply-filter-btn" style="flex: 1;">Áp dụng</button>
+                        <a href="/restaurant-page" class="apply-filter-btn" style="flex: 1; background-color: #6c757d; text-align: center; text-decoration: none;">Xóa lọc</a>
+                    </div>
+                </form>
             </div>
 
             <div class="results-section">
                 <div class="results-header">
-                    <div class="results-info"><h2>Nhà hàng tại Cát Bà</h2><p>Tìm thấy <span>6</span> nhà hàng</p></div>
-                    <div class="results-controls"><div class="sort-control"><label>Sắp xếp:</label><select class="sort-select"><option>Phù hợp nhất</option><option>Đánh giá cao nhất</option></select></div></div>
-                </div>
-                <div class="popular-filters">
-                    <span class="filter-tag">Hải sản tươi</span><span class="filter-tag">Món Việt</span><span class="filter-tag">BBQ</span><span class="filter-tag">View đẹp</span>
-                </div>
+                            <div class="results-info"><h2>Nhà hàng tại Cát Bà</h2><p>Tìm thấy <span>@Model.TotalCount</span> nhà hàng</p></div>
+                    <div class="results-controls">
+                        <div class="sort-control">
+                            <label>Sắp xếp:</label>
+                            <select name="sortOrder" form="filterForm" class="sort-select" onchange="this.form.submit()">
+                                @if(Model.SortOrder == "Phù hợp nhất" || string.IsNullOrEmpty(Model.SortOrder)) { <option selected>Phù hợp nhất</option> } else { <option>Phù hợp nhất</option> }
+                                @if(Model.SortOrder == "Đánh giá cao nhất") { <option selected>Đánh giá cao nhất</option> } else { <option>Đánh giá cao nhất</option> }
+                            </select>
+                        </div>
+                    </div>
+                </div>               
 
-                <div class="restaurants-grid">
-                    <div class="restaurant-card">
-                        <div class="card-image"><img src="https://images.unsplash.com/photo-1514190051997-0f6f39ca5cde?w=400&h=250&fit=crop" alt="Hải Sản Cát Bà"><div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div></div>
-                        <div class="card-content">
-                            <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div><span class="reviews">(215)</span></div></div>
-                            <h3>Nhà hàng Hải Sản Cát Bà</h3>
-                            <div class="cuisines"><span class="specialty">Hải sản</span></div>
-                            <div class="location"><i class="fas fa-map-marker-alt"></i> Cát Cò 1</div>
-                            <a class="detail-btn" href="/restaurant-detail">Chi tiết</a>
+                        <div class="restaurants-grid">
+                            @if (!Model.Items.Any())
+                            {
+                                <p style="grid-column:1/-1;text-align:center;color:#6c757d;">Không tìm thấy nhà hàng nào.</p>
+                            }
+                            @foreach (var restaurant in Model.Items)
+                            {
+                                <div class="restaurant-card">
+                                    <div class="card-image">
+                                        <img src="@(restaurant.ThumbnailUrl ?? "/images/default-restaurant.jpg")" alt="@restaurant.Name">
+                                        <div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div>
+                                    </div>
+                                    <div class="card-content">
+                                        <div class="rating-price">
+                                            <div class="rating">
+                                                <div class="stars">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        if (i <= Math.Floor(restaurant.AverageRating))
+                                                        {
+                                                            <i class="fas fa-star"></i>
+                                                        }
+                                                        else if (i - restaurant.AverageRating < 1 && i - restaurant.AverageRating > 0)
+                                                        {
+                                                            <i class="fas fa-star-half-alt"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="far fa-star"></i>
+                                                        }
+                                                    }
+                                                </div>
+                                                <span class="reviews">(@restaurant.ReviewCount)</span>
+                                            </div>
+                                        </div>
+                                        <h3>@restaurant.Name</h3>
+                                        <div class="location"><i class="fas fa-map-marker-alt"></i> @(restaurant.AreaName ?? restaurant.Address)</div>
+                                        <a class="detail-btn" href="/restaurant/detail/@restaurant.BusinessId">Chi tiết</a>
+                                    </div>
+                                </div>
+                            }
                         </div>
-                    </div>
-                    <div class="restaurant-card">
-                        <div class="card-image"><img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&h=250&fit=crop" alt="Đảo Xanh"><div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div></div>
-                        <div class="card-content">
-                            <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span class="reviews">(142)</span></div></div>
-                            <h3>Quán Đảo Xanh</h3>
-                            <div class="cuisines"><span class="specialty">Món Việt</span></div>
-                            <div class="location"><i class="fas fa-map-marker-alt"></i> Bến Bèo</div>
-                            <a class="detail-btn" href="/restaurant-detail">Chi tiết</a>
-                        </div>
-                    </div>
-                    <div class="restaurant-card">
-                        <div class="card-image"><img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=250&fit=crop" alt="BBQ Biển"><div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div></div>
-                        <div class="card-content">
-                            <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span class="reviews">(89)</span></div></div>
-                            <h3>BBQ Biển Cát Bà</h3>
-                            <div class="cuisines"><span class="specialty">BBQ</span></div>
-                            <div class="location"><i class="fas fa-map-marker-alt"></i> Cát Cò 3</div>
-                            <a class="detail-btn" href="/restaurant-detail">Chi tiết</a>
-                        </div>
-                    </div>
-                    <div class="restaurant-card">
-                        <div class="card-image"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=250&fit=crop" alt="Nhà Hàng Biển Đông"><div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div></div>
-                        <div class="card-content">
-                            <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span class="reviews">(76)</span></div></div>
-                            <h3>Nhà Hàng Biển Đông</h3>
-                            <div class="cuisines"><span class="specialty">Hải sản</span></div>
-                            <div class="location"><i class="fas fa-map-marker-alt"></i> Cát Cò 2</div>
-                            <a class="detail-btn" href="/restaurant-detail">Chi tiết</a>
-                        </div>
-                    </div>
-                    <div class="restaurant-card">
-                        <div class="card-image"><img src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=250&fit=crop" alt="Phố Biển Cát Bà"><div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div></div>
-                        <div class="card-content">
-                            <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i></div><span class="reviews">(53)</span></div></div>
-                            <h3>Phố Biển Cát Bà</h3>
-                            <div class="cuisines"><span class="specialty">Món Việt</span></div>
-                            <div class="location"><i class="fas fa-map-marker-alt"></i> Trung tâm</div>
-                            <a class="detail-btn" href="/restaurant-detail">Chi tiết</a>
-                        </div>
-                    </div>
-                    <div class="restaurant-card">
-                        <div class="card-image"><img src="https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=400&h=250&fit=crop" alt="Lẩu Hải Sản"><div class="badge cuisine"><i class="fas fa-utensils"></i> Restaurant</div></div>
-                        <div class="card-content">
-                            <div class="rating-price"><div class="rating"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span class="reviews">(134)</span></div></div>
-                            <h3>Lẩu Hải Sản Cát Bà</h3>
-                            <div class="cuisines"><span class="specialty">Lẩu</span></div>
-                            <div class="location"><i class="fas fa-map-marker-alt"></i> Bến Bèo</div>
-                            <a class="detail-btn" href="/restaurant-detail">Chi tiết</a>
-                        </div>
-                    </div>
-                </div>
+                        <div class="pagination">
+                    @{
+                        var minRatingQs = Model.MinRating != null ? string.Join("", Model.MinRating.Select(r => $"&minRating={r}")) : "";
+                        var qs = $"&areaId={Model.AreaId}&restaurantType={Model.RestaurantType}{minRatingQs}&sortOrder={Model.SortOrder}";
+                    }
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <a href="?page=@(Model.CurrentPage - 1)@qs" class="page-btn"><i class="fas fa-chevron-left"></i></a>
+                    }
+                    else
+                    {
+                        <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+                    }
 
-                <div class="pagination">
-                    <button class="page-btn" disabled>Trước</button>
-                    <a href="#" class="page-btn active">1</a>
-                    <a href="#" class="page-btn">2</a>
-                    <a href="#" class="page-btn">Sau</a>
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <a href="?page=@i@qs" class="page-btn @(i == Model.CurrentPage ? "active" : "")">@i</a>
+                    }
+
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <a href="?page=@(Model.CurrentPage + 1)@qs" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+                    }
+                    else
+                    {
+                        <button class="page-btn" disabled><i class="fas fa-chevron-right"></i></button>
+                    }
                 </div>
             </div>
-        </div></div></div>
-    </form>
+        </div>
+    </div>
+</div>
 
     @await Html.PartialAsync("Footer")
 </body>

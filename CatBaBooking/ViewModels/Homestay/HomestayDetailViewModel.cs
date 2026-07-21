@@ -14,6 +14,7 @@ public class HomestayDetailViewModel
     public string? AreaName { get; set; }
     public string? Phone { get; set; }
     public string? ThumbnailUrl { get; set; }
+    public string? OwnerName { get; set; }
 
     // ── Tiện nghi (Amenities) ─────────────────────────────────────────────────
     public IEnumerable<string> Amenities { get; set; } = new List<string>();

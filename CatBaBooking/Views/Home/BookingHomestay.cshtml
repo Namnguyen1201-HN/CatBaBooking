@@ -1,5 +1,7 @@
 
 
+@model CatBaBooking.ViewModels.Homestay.BookingHomestayViewModel
+
 @{
 Layout = null;
 }
@@ -35,50 +37,30 @@ Layout = null;
         <h2 class="mt-2 fw-bold text-primary">Xác nhận đặt phòng</h2>
     </div>
 
-    <form action="#" method="POST" id="bookingForm">
-        <input type="hidden" name="roomId" value="1">
-        <input type="hidden" id="pricePerNight" value="850000">
+    <form action="/checkout-homestay" method="GET" id="bookingForm">
+        <input type="hidden" name="RoomId" value="@Model.RoomId">
+        <input type="hidden" name="BusinessId" value="@Model.BusinessId">
+        <input type="hidden" id="pricePerNight" value="@Model.PricePerNight">
 
         <div class="row">
             <div class="col-md-7">
-                <div class="room-card mb-4">
-                    <h5 class="section-title"><i class="bi bi-person-lines-fill text-primary me-2"></i>Thông tin liên hệ</h5>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Họ và tên <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control py-2" name="fullName" value="Nguyễn Văn A" placeholder="Nhập họ tên người nhận phòng" required>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Số điện thoại <span class="text-danger">*</span></label>
-                            <input type="tel" class="form-control py-2" name="phone" value="0912345678" placeholder="0912xxxxxx" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control py-2" name="email" value="nguyenvana@email.com" placeholder="example@email.com" required>
-                        </div>
-                    </div>
-                    <div class="mb-0">
-                        <label class="form-label fw-bold">Ghi chú</label>
-                        <textarea class="form-control" name="notes" rows="2" placeholder="Lời nhắn cho chủ nhà (giờ đến, yêu cầu đặc biệt...)"></textarea>
-                    </div>
-                </div>
 
                 <div class="room-card">
                     <h5 class="section-title"><i class="bi bi-calendar-check text-primary me-2"></i>Chi tiết chuyến đi</h5>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Nhận phòng</label>
-                            <input type="date" class="form-control py-2 bg-white" name="checkIn" id="checkIn" required>
+                            <input type="date" class="form-control py-2 bg-white" name="CheckIn" id="checkIn" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Trả phòng</label>
-                            <input type="date" class="form-control py-2 bg-white" name="checkOut" id="checkOut" required>
+                            <input type="date" class="form-control py-2 bg-white" name="CheckOut" id="checkOut" required>
                         </div>
                     </div>
                     <div class="mb-0">
                         <label class="form-label fw-bold">Số khách</label>
-                        <input type="number" class="form-control py-2" name="guests" value="2" min="1" max="4" required>
-                        <small class="text-muted">Phòng này tối đa 4 người.</small>
+                        <input type="number" class="form-control py-2" name="NumGuests" value="2" min="1" max="@Model.MaxCapacity" required>
+                        <small class="text-muted">Phòng này tối đa @Model.MaxCapacity người.</small>
                     </div>
                 </div>
             </div>
@@ -86,20 +68,20 @@ Layout = null;
             <div class="col-md-5">
                 <div class="room-card sticky-top" style="top:20px;">
                     <h5 class="section-title border-bottom pb-3 mb-3">Tóm tắt đơn phòng</h5>
-                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&h=220&fit=crop" class="room-img shadow-sm" alt="Homestay Image">
+                    <img src="@(string.IsNullOrEmpty(Model.ThumbnailUrl) ? "/images/default-room.jpg" : Model.ThumbnailUrl)" class="room-img shadow-sm" alt="@Model.HomestayName">
                     <div class="mb-2">
                         <small class="text-uppercase text-muted fw-bold">Homestay</small>
-                        <h5 class="mb-1 text-primary fw-bold">Homestay Ocean View Cát Bà</h5>
-                        <p class="small text-muted mb-0"><i class="bi bi-geo-alt-fill"></i> Cát Cò 1, Cát Bà, Hải Phòng</p>
+                        <h5 class="mb-1 text-primary fw-bold">@Model.HomestayName</h5>
+                        <p class="small text-muted mb-0"><i class="bi bi-geo-alt-fill"></i> @Model.Address</p>
                     </div>
                     <hr class="my-3">
                     <div class="mb-3">
                         <small class="text-uppercase text-muted fw-bold">Loại phòng</small>
-                        <div class="fs-5 fw-bold text-dark">Phòng Deluxe View Biển</div>
+                        <div class="fs-5 fw-bold text-dark">@Model.RoomName</div>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Giá phòng:</span>
-                        <span class="fw-bold">850,000₫ / đêm</span>
+                        <span class="fw-bold">@Model.PricePerNight.ToString("N0")₫ / đêm</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Thời gian:</span>

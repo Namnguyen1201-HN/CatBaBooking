@@ -1,5 +1,7 @@
 
 
+@model CatBaBooking.ViewModels.Homestay.CheckoutHomestayViewModel
+
 @{
     Layout = null;
 }
@@ -56,67 +58,74 @@
             <section class="form-card">
                 <h2>Thông tin người đặt</h2>
                 <p style="font-size:.9rem;color:#6b7280;margin-bottom:1.5rem;">Vui lòng cung cấp thông tin để hoàn tất đặt phòng.</p>
-                <form action="#" method="POST" id="checkoutForm">
+                <form action="/checkout-homestay" method="POST" id="checkoutForm">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger" style="margin-bottom: 1rem; color: #dc3545; background-color: #f8d7da; border-color: #f5c6cb; padding: .75rem 1.25rem; border: 1px solid transparent; border-radius: .25rem;">
+                            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                        </div>
+                    }
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">Họ và tên *</label>
-                            <input type="text" name="fullName" class="form-input" required placeholder="Nguyễn Văn A" value="Nguyễn Văn A">
+                            <input type="text" name="BookerName" class="form-input" required placeholder="Nguyễn Văn A" value="@Model.BookerName">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Số điện thoại *</label>
-                            <input type="tel" name="phone" class="form-input" required placeholder="09xxxxxxxx" value="0912345678">
+                            <input type="tel" name="BookerPhone" class="form-input" required placeholder="09xxxxxxxx" value="@Model.BookerPhone">
                         </div>
                     </div>
                     <div class="form-group full-width">
                         <label class="form-label">Email *</label>
-                        <input type="email" name="email" class="form-input" required placeholder="nguyenvana@example.com" value="nguyenvana@email.com">
+                        <input type="email" name="BookerEmail" class="form-input" required placeholder="nguyenvana@example.com" value="@Model.BookerEmail">
                     </div>
                     <div class="form-group full-width">
                         <label class="form-label">Yêu cầu đặc biệt (Nếu có)</label>
-                        <textarea name="notes" class="form-input" placeholder="Ví dụ: Tôi muốn nhận phòng sớm, vui lòng sắp xếp phòng ở tầng cao..."></textarea>
+                        <textarea name="Notes" class="form-input" placeholder="Ví dụ: Tôi muốn nhận phòng sớm, vui lòng sắp xếp phòng ở tầng cao...">@Model.Notes</textarea>
                     </div>
-                    <input type="hidden" name="roomId" value="1">
-                    <input type="hidden" name="checkIn" value="2025-06-20">
-                    <input type="hidden" name="checkOut" value="2025-06-23">
-                    <input type="hidden" name="guests" value="2">
-                    <input type="hidden" name="totalAmount" value="2550000">
+                    <input type="hidden" name="RoomId" value="@Model.RoomId">
+                    <input type="hidden" name="BusinessId" value="@Model.BusinessId">
+                    <input type="hidden" name="CheckIn" value="@Model.CheckIn.ToString("yyyy-MM-dd")">
+                    <input type="hidden" name="CheckOut" value="@Model.CheckOut.ToString("yyyy-MM-dd")">
+                    <input type="hidden" name="NumGuests" value="@Model.NumGuests">
+                    <input type="hidden" name="TotalAmount" value="@Model.TotalAmount">
                 </form>
             </section>
 
             <aside class="summary-card">
                 <h3>Chi tiết đặt phòng</h3>
-                <h4>Homestay Ocean View Cát Bà</h4>
+                <h4>@Model.HomestayName</h4>
                 <div class="summary-item-list">
                     <div class="summary-item">
                         <div>
-                            <div class="summary-item-name">Phòng Deluxe View Biển</div>
-                            <div class="summary-item-meta">2 người</div>
+                            <div class="summary-item-name">@Model.RoomName</div>
+                            <div class="summary-item-meta">@Model.NumGuests người</div>
                         </div>
-                        <div class="summary-item-price">850,000₫/đêm</div>
+                        <div class="summary-item-price">@Model.PricePerNight.ToString("N0")₫/đêm</div>
                     </div>
                     <div class="summary-item">
                         <div>
                             <div class="summary-item-name">Nhận Phòng (Ngày đến)</div>
                             <div class="summary-item-meta">Từ 14:00</div>
                         </div>
-                        <div class="summary-item-price">20/06/2025</div>
+                        <div class="summary-item-price">@Model.CheckIn.ToString("dd/MM/yyyy")</div>
                     </div>
                     <div class="summary-item">
                         <div>
                             <div class="summary-item-name">Trả Phòng (Ngày đi)</div>
                             <div class="summary-item-meta">Từ 12:00</div>
                         </div>
-                        <div class="summary-item-price">23/06/2025</div>
+                        <div class="summary-item-price">@Model.CheckOut.ToString("dd/MM/yyyy")</div>
                     </div>
                 </div>
                 <div class="summary-details">
-                    <div class="detail-row"><span class="label">Số đêm</span><span>3 đêm</span></div>
-                    <div class="detail-row"><span class="label">Số khách</span><span>2 người</span></div>
+                    <div class="detail-row"><span class="label">Số đêm</span><span>@Model.TotalNights đêm</span></div>
+                    <div class="detail-row"><span class="label">Số khách</span><span>@Model.NumGuests người</span></div>
                 </div>
                 <div class="summary-total">
                     <div class="total-row">
                         <span class="label">Tổng cộng</span>
-                        <span style="color:#d32f2f;">2,550,000₫</span>
+                        <span style="color:#d32f2f;">@Model.TotalAmount.ToString("N0")₫</span>
                     </div>
                 </div>
                 <button type="submit" form="checkoutForm" class="confirm-btn">

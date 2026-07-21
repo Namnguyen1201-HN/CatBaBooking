@@ -41,25 +41,6 @@
         <div class="hero-overlay"></div><div class="hero-bg"></div>
         <div class="container"><div class="hero-content">
             <div class="hero-text"><h1>Homestay tại Cát Bà</h1><p>Tìm và đặt homestay phù hợp với nhu cầu của bạn</p></div>
-            <div class="search-forms"><div class="search-form active">
-                <div class="form-tabs">
-                    <button class="form-tab active"><i class="fas fa-home"></i><span>Homestay</span></button>
-                    @* <button class="form-tab"><span>Villa</span></button>
-                    <button class="form-tab"><span>Phòng đôi</span></button> *@
-                </div>
-                <form action="/homestay" method="GET">
-                    <div class="form-grid" style="display:flex;flex-wrap:wrap;gap:15px;align-items:end;">
-                        <div class="form-field" style="flex:0 0 200px;"><label>Khu vực</label><div class="input-wrapper"><i class="fas fa-map-marker-alt"></i><select name="areaId" class="form-select"><option value="0">Tất cả khu vực</option><option value="1">Cát Cò 1</option><option value="2">Cát Cò 2</option></select></div></div>
-                        <div class="form-field" style="flex:0 0 220px;"><label>Ngày nhận</label><div class="input-wrapper"><i class="fas fa-calendar"></i><input type="date" name="checkIn" class="form-input"></div></div>
-                        <div class="form-field" style="flex:0 0 220px;"><label>Ngày trả</label><div class="input-wrapper"><i class="fas fa-calendar"></i><input type="date" name="checkOut" class="form-input"></div></div>
-                        <div class="form-field-group" style="flex:0 0 220px;display:flex;gap:10px;">
-                            <div class="form-field" style="flex:1;"><label>Số người</label><div class="input-wrapper"><i class="fas fa-users"></i><input type="number" name="guests" class="form-input" min="1" value="1"></div></div>
-                            <div class="form-field" style="flex:1;"><label>Số phòng</label><div class="input-wrapper"><i class="fas fa-door-open"></i><input type="number" name="numRooms" class="form-input" min="1" value="1"></div></div>
-                        </div>
-                        <div class="form-field" style="flex:0 0 200px;"><button type="submit" class="search-btn"><i class="fas fa-search"></i> Tìm homestay</button></div>
-                    </div>
-                </form>
-            </div></div>
         </div></div>
     </section>
 
@@ -68,37 +49,53 @@
             <div class="content-layout">
 
                 <div class="sidebar">
-                    <div class="filter-section">
+                    <form id="filterForm" action="/homestay-page" method="GET" class="filter-section">
                         <div class="filter-header"><i class="fas fa-sliders-h"></i><h3>Bộ lọc</h3></div>
+                        
+                        <div class="filter-group">
+                            <h4>Khu vực</h4>
+                            <div class="filter-options">
+                                <label class="filter-option"><input type="radio" name="areaId" value="0" @(Model.AreaId == null || Model.AreaId == 0 ? "checked" : "")><span>Tất cả khu vực</span></label>
+                                <label class="filter-option"><input type="radio" name="areaId" value="1" @(Model.AreaId == 1 ? "checked" : "")><span>TT.Cát Bà</span></label>
+                                <label class="filter-option"><input type="radio" name="areaId" value="2" @(Model.AreaId == 2 ? "checked" : "")><span>Trung tâm Cát Bà</span></label>
+                                <label class="filter-option"><input type="radio" name="areaId" value="3" @(Model.AreaId == 3 ? "checked" : "")><span>Vườn quốc gia Cát Bà</span></label>
+                                <label class="filter-option"><input type="radio" name="areaId" value="4" @(Model.AreaId == 4 ? "checked" : "")><span>Làng Việt Hải</span></label>
+                                <label class="filter-option"><input type="radio" name="areaId" value="5" @(Model.AreaId == 5 ? "checked" : "")><span>Bến Bèo</span></label>
+                            </div>
+                        </div>
+
                         <div class="filter-group">
                             <h4>Khoảng giá (VND)</h4>
                             <div class="filter-options">
-                                <label class="filter-option"><input type="radio" name="priceRange" value="" checked><span>Tất cả</span></label>
-                                <label class="filter-option"><input type="radio" name="priceRange" value="0-200000"><span>Dưới 200.000</span></label>
-                                <label class="filter-option"><input type="radio" name="priceRange" value="200000-500000"><span>200.000 - 500.000</span></label>
-                                <label class="filter-option"><input type="radio" name="priceRange" value="500000-1000000"><span>500.000 - 1.000.000</span></label>
-                                <label class="filter-option"><input type="radio" name="priceRange" value="1000000-0"><span>Trên 1.000.000</span></label>
+                                <label class="filter-option"><input type="radio" name="priceRange" value="" @(string.IsNullOrEmpty(Model.PriceRange) ? "checked" : "")><span>Tất cả</span></label>
+                                <label class="filter-option"><input type="radio" name="priceRange" value="0-200000" @(Model.PriceRange == "0-200000" ? "checked" : "")><span>Dưới 200.000</span></label>
+                                <label class="filter-option"><input type="radio" name="priceRange" value="200000-500000" @(Model.PriceRange == "200000-500000" ? "checked" : "")><span>200.000 - 500.000</span></label>
+                                <label class="filter-option"><input type="radio" name="priceRange" value="500000-1000000" @(Model.PriceRange == "500000-1000000" ? "checked" : "")><span>500.000 - 1.000.000</span></label>
+                                <label class="filter-option"><input type="radio" name="priceRange" value="1000000-0" @(Model.PriceRange == "1000000-0" ? "checked" : "")><span>Trên 1.000.000</span></label>
                             </div>
                         </div>
                         <div class="filter-group">
                             <h4>Đánh giá</h4>
                             <div class="filter-options">
-                                <label class="filter-option"><input type="checkbox" name="minRating" value="5"><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span>5 sao</span></div></label>
-                                <label class="filter-option"><input type="checkbox" name="minRating" value="4"><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span>4+ sao</span></div></label>
-                                <label class="filter-option"><input type="checkbox" name="minRating" value="3"><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div><span>3+ sao</span></div></label>
+                                <label class="filter-option"><input type="checkbox" name="minRating" value="5" @(Model.MinRating != null && Model.MinRating.Contains(5) ? "checked" : "")><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><span>5 sao</span></div></label>
+                                <label class="filter-option"><input type="checkbox" name="minRating" value="4" @(Model.MinRating != null && Model.MinRating.Contains(4) ? "checked" : "")><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div><span>4+ sao</span></div></label>
+                                <label class="filter-option"><input type="checkbox" name="minRating" value="3" @(Model.MinRating != null && Model.MinRating.Contains(3) ? "checked" : "")><div class="rating-option"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div><span>3+ sao</span></div></label>
                             </div>
                         </div>
                         <div class="filter-group">
                             <h4>Tiện ích</h4>
                             <div class="filter-options">
-                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="1"><span>WiFi miễn phí</span></label>
-                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="2"><span>Bữa sáng</span></label>
-                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="3"><span>Bãi đỗ xe</span></label>
-                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="4"><span>Hồ bơi</span></label>
+                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="1" @(Model.AmenityIds != null && Model.AmenityIds.Contains(1) ? "checked" : "")><span>WiFi miễn phí</span></label>
+                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="2" @(Model.AmenityIds != null && Model.AmenityIds.Contains(2) ? "checked" : "")><span>Bữa sáng</span></label>
+                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="3" @(Model.AmenityIds != null && Model.AmenityIds.Contains(3) ? "checked" : "")><span>Bãi đỗ xe</span></label>
+                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="4" @(Model.AmenityIds != null && Model.AmenityIds.Contains(4) ? "checked" : "")><span>Hồ bơi</span></label>
                             </div>
                         </div>
-                        <button class="apply-filter-btn">Áp dụng bộ lọc</button>
-                    </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="apply-filter-btn" style="flex: 1;">Áp dụng</button>
+                            <a href="/homestay-page" class="apply-filter-btn" style="flex: 1; background-color: #6c757d; text-align: center; text-decoration: none;">Xóa lọc</a>
+                        </div>
+                    </form>
                 </div>
 
                 <div class="results-section">
@@ -107,19 +104,19 @@
                             <h2>Homestay tại Cát Bà</h2>
                             <p>Tìm thấy <span>@Model.TotalCount</span> homestay.</p>
                         </div>
-                    </div>
 
-                    <div class="results-controls">
-                        <div class="sort-control">
-                            <label>Sắp xếp</label>
-                            <select class="sort-select">
-                                <option>Phù hợp nhất</option>
-                                <option>Giá thấp đến cao</option>
-                                <option>Giá cao đến thấp</option>
-                                <option>Đánh giá cao nhất</option>
-                            </select>
+                        <div class="results-controls">
+                            <div class="sort-control">
+                                <label>Sắp xếp</label>
+                                <select name="sortOrder" form="filterForm" class="sort-select" onchange="this.form.submit()">
+                                    @if(Model.SortOrder == "Phù hợp nhất" || string.IsNullOrEmpty(Model.SortOrder)) { <option selected>Phù hợp nhất</option> } else { <option>Phù hợp nhất</option> }
+                                    @if(Model.SortOrder == "Giá thấp đến cao") { <option selected>Giá thấp đến cao</option> } else { <option>Giá thấp đến cao</option> }
+                                    @if(Model.SortOrder == "Giá cao đến thấp") { <option selected>Giá cao đến thấp</option> } else { <option>Giá cao đến thấp</option> }
+                                    @if(Model.SortOrder == "Đánh giá cao nhất") { <option selected>Đánh giá cao nhất</option> } else { <option>Đánh giá cao nhất</option> }
+                                </select>
+                            </div>
                         </div>
-                    </div>
+                    </div>                   
 
                     <div class="homestay-grid">
                         @if (!Model.Items.Any())
@@ -168,15 +165,20 @@
                                         @(homestay.AreaName ?? homestay.Address)
                                     </div>
                                 </div>
-                                <a class="detail-btn" href="/homestay/detail/@homestay.BusinessId">Chi tiết</a>
+                                <a class="detail-btn" href="/homestay/detail/@homestay.BusinessId">Chi tiết</a> 
                             </div>
                         }
                     </div>
 
                     <div class="pagination">
+                        @{
+                            var minRatingQs = Model.MinRating != null ? string.Join("", Model.MinRating.Select(r => $"&minRating={r}")) : "";
+                            var amenityIdsQs = Model.AmenityIds != null ? string.Join("", Model.AmenityIds.Select(a => $"&amenityIds={a}")) : "";
+                            var qs = $"&areaId={Model.AreaId}&priceRange={Model.PriceRange}{minRatingQs}{amenityIdsQs}&sortOrder={Model.SortOrder}";
+                        }
                         @if (Model.CurrentPage > 1)
                         {
-                            <a href="?page=@(Model.CurrentPage - 1)" class="page-btn">Trước</a>
+                            <a href="?page=@(Model.CurrentPage - 1)@qs" class="page-btn">Trước</a>
                         }
                         else
                         {
@@ -184,12 +186,12 @@
                         }
                         @for (int p = 1; p <= Model.TotalPages; p++)
                         {
-                            <a href="?page=@p"
+                            <a href="?page=@p@qs"
                                class="page-btn @(p == Model.CurrentPage ? "active" : "")">@p</a>
                         }
                         @if (Model.CurrentPage < Model.TotalPages)
                         {
-                            <a href="?page=@(Model.CurrentPage + 1)" class="page-btn">Sau</a>
+                            <a href="?page=@(Model.CurrentPage + 1)@qs" class="page-btn">Sau</a>
                         }
                         else
                         {
