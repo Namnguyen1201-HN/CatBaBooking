@@ -1,0 +1,429 @@
+﻿@model CatBaBooking.ViewModels.OwnerDashboardViewModel
+@{
+    // Dòng này rất quan trọng trong ASP.NET Core để ẩn đi thanh Navbar mặc định (Home, Privacy...)
+    Layout = null; 
+}
+@using CatBaBooking.Resources.Views.Owner
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng quan - Cát Bà Booking</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fc; /* Màu nền xám nhạt như ảnh 1 */
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            align-items: stretch;
+        }
+
+        .sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background-color: #0e6b53; /* Màu xanh lá đậm gốc */
+            color: #ffffff;
+            min-height: 100vh;
+            transition: all 0.3s;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-brand {
+            text-align: center;
+            padding: 20px 10px;
+            color: #fff;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand h5 {
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar-brand span {
+            font-size: 0.8rem;
+            font-weight: normal;
+            display: block;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        .sidebar .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        /* Trạng thái Hover và Active của Menu */
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #fff;
+        }
+
+        /* Mục đăng xuất đẩy xuống dưới cùng */
+        .logout-item {
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .header {
+            background: #fff;
+            padding: 15px 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        #sidebar-toggle {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 1.2rem;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .header-title {
+            color: #0e6b53; /* Màu chữ xanh lá cho title Tổng quan */
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin: 0;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .user-info {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .stat-card {
+            border: none; 
+            border-radius: 8px; 
+            padding: 20px; 
+            color: white;
+            height: 100%; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Màu sắc Card chuẩn theo ảnh 1 */
+        .bg-success-custom { background-color: #2eb872; } /* Xanh lá */
+        .bg-primary-custom { background-color: #4169e1; } /* Xanh biển */
+        .bg-warning-custom { background-color: #f6c23e; } /* Vàng */
+        .bg-info-custom    { background-color: #36b9cc; } /* Xanh ngọc */
+
+        .stat-title { font-size: 0.8rem; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; }
+        .stat-value { font-size: 2rem; font-weight: 800; line-height: 1; }
+        .stat-icon { 
+            font-size: 3rem; 
+            opacity: 0.2; 
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Table */
+        .card-custom {
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Status badge dạng pill */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 50px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        .status-confirmed { background-color: #1cc88a; } /* xanh lá */
+        .status-completed { background-color: #4169e1; } /* xanh biển */
+        .status-pending   { background-color: #f6c23e; color: #664d03; } /* vàng */
+        .status-cancelled { background-color: #e74a3b; } /* đỏ */
+        .status-noshow    { background-color: #858796; } /* xám */
+        .status-default   { background-color: #858796; }
+
+        .btn-detail {
+            background-color: #0e6b53;
+            border-color: #0e6b53;
+            color: #fff;
+            font-size: 0.82rem;
+            padding: 5px 14px;
+            border-radius: 6px;
+        }
+        .btn-detail:hover {
+            background-color: #0a5340;
+            color: #fff;
+        }
+
+        #sidebar-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        @@media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                margin-left: -250px;
+            }
+            .sidebar.active {
+                margin-left: 0;
+            }
+            .header-title {
+                display: none; /* Ẩn title ở giữa trên mobile cho đỡ chật */
+            }
+        }
+    </style>
+</head>
+<body>
+    
+   <div class="wrapper">
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <h5>🚢 @SidebarResources.CatBaBooking</h5>
+                <span>@SidebarResources.OwnerDashboard</span>
+            </div>
+            
+            <ul class="nav flex-column mt-3 w-100">
+                <li class="nav-item">
+                    <a class="nav-link active" asp-controller="OwnerDashboard" asp-action="OwnerDashboard">
+                        <i class="bi bi-houses-fill text-warning"></i> @SidebarResources.Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="RestaurantProfile" asp-action="RestaurantProfile">
+                        <i class="bi bi-shop text-warning"></i> @SidebarResources.RestaurantInfo
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="RestaurantManageDishes" asp-action="RestaurantManageDishes">
+                        <i class="bi bi-egg-fried text-light"></i> @SidebarResources.ManageDishes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="RestaurantBookings" asp-action="RestaurantBookings">
+                        <i class="bi bi-calendar-check text-light"></i> @SidebarResources.BookingHistory
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="RestaurantManageTables" asp-action="RestaurantManageTables">
+                        <i class="bi bi-grid-3x3 text-light"></i> @SidebarResources.ManageTables
+                    </a>
+                </li>
+                
+                <li class="nav-item logout-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-box-arrow-right text-light"></i> @SidebarResources.Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+       <div id="sidebar-overlay"></div>
+
+        <div class="main-content">
+            <header class="header">
+                <button id="sidebar-toggle"><i class="bi bi-list"></i></button>
+                <h1 class="header-title">@OwnerDashboardResources.Title</h1>
+                <div class="user-info">
+                    @Model.RestaurantName
+                </div>
+            </header>
+
+            <main class="content p-4">
+                <div class="container-fluid p-0">
+                    
+                    <!-- Lời chào và Nút điều hướng -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+                        <div>
+                            <h3 class="text-primary fw-bold mb-1" style="color: #0d6efd !important;">
+                                @OwnerDashboardResources.Welcome, @Model.RestaurantName
+                            </h3>
+                            <p class="text-muted small mb-0">
+                                @OwnerDashboardResources.RestaurantType: <span class="badge bg-secondary">RESTAURANT</span>
+                            </p>
+                        </div>
+                        <div>
+                            <a href="#" class="btn btn-success" style="background-color: #0e6b53; border-color: #0e6b53;">
+                                <i class="bi bi-calendar-check me-1"></i> @OwnerDashboardResources.ManageBookings
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-5">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="stat-card bg-success-custom">
+                                <div>
+                                    <div class="stat-title">@OwnerDashboardResources.TotalRevenue</div>
+                                    <div class="stat-value">@Model.TotalRevenue.ToString("N0") ₫</div>
+                                </div>
+                                <i class="bi bi-currency-dollar stat-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="stat-card bg-primary-custom">
+                                <div>
+                                    <div class="stat-title">@OwnerDashboardResources.TotalOrders</div>
+                                    <div class="stat-value">@Model.TotalOrders</div>
+                                </div>
+                                <i class="bi bi-receipt stat-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="stat-card bg-warning-custom">
+                                <div>
+                                    <div class="stat-title">@OwnerDashboardResources.PendingOrders</div>
+                                    <div class="stat-value">@Model.PendingOrders</div>
+                                </div>
+                                <i class="bi bi-hourglass-split stat-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="stat-card bg-info-custom">
+                                <div>
+                                    <div class="stat-title">@OwnerDashboardResources.AverageRating</div>
+                                    <div class="stat-value">@Model.AvgRating.ToString("0.0") / 5</div>
+                                    <div style="font-size: 0.85rem; margin-top: 5px;">(@Model.ReviewCount lượt)</div>
+                                </div>
+                                <i class="bi bi-star-fill stat-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-custom">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold text-primary mb-4" style="color: #0d6efd !important;">
+                                @OwnerDashboardResources.RecentBookings
+                            </h6>
+                            
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead class="table-light" style="border-bottom: 2px solid #dee2e6;">
+                                        <tr>
+                                            <th class="py-3">@OwnerDashboardResources.BookingCode</th>
+                                            <th class="py-3">@OwnerDashboardResources.Customer</th>
+                                            <th class="py-3">@OwnerDashboardResources.TotalAmount</th>
+                                            <th class="py-3">@OwnerDashboardResources.Status</th>
+                                            <th class="py-3">@OwnerDashboardResources.Detail</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.RecentBookings != null && Model.RecentBookings.Any())
+                                        {
+                                            foreach (var b in Model.RecentBookings)
+                                            {
+                                                <tr>
+                                                    <td class="fw-bold text-primary py-3">#@b.BookingCode</td>
+                                                    <td class="py-3">@b.BookerName</td>
+                                                    <td class="fw-bold py-3">@b.TotalPrice.ToString("N0") ₫</td>
+                                                    <td class="py-3">
+                                                        <span class="status-badge @b.StatusBadgeClass">@b.StatusLabel</span>
+                                                    </td>
+                                                    <td class="py-3">
+                                                        <a class="btn btn-detail" asp-controller="RestaurantBookings" asp-action="RestaurantBookings" asp-route-id="@b.BookingId">
+                                                            @OwnerDashboardResources.Detail
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted py-4">
+                                                    @OwnerDashboardResources.NoBookings
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('sidebar-toggle');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if(toggle) {
+                toggle.addEventListener('click', () => { 
+                    sidebar.classList.add('active'); 
+                    overlay.style.display = 'block'; 
+                });
+            }
+            
+            if(overlay) {
+                overlay.addEventListener('click', () => { 
+                    sidebar.classList.remove('active'); 
+                    overlay.style.display = 'none'; 
+                });
+            }
+        });
+    </script>
+</body>
+</html>

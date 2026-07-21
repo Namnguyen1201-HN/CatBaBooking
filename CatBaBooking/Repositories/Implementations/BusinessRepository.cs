@@ -24,4 +24,15 @@ public class BusinessRepository : IBusinessRepository
         _context.SaveChanges();
         return true;
     }
+
+    public Business? GetByOwnerId(int ownerId)
+    {
+        return _context.Businesses.FirstOrDefault(x => x.OwnerId == ownerId);
+    }
+
+    public void Update(Business business)
+    {
+        _context.Businesses.Update(business);
+        _context.SaveChanges();
+    }
 }

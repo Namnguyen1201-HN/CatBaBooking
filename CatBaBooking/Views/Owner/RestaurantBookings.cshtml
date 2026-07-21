@@ -1,0 +1,589 @@
+﻿@model CatBaBooking.ViewModels.RestaurantBookingsViewModel
+@{
+    // Ẩn Layout mặc định của ASP.NET Core để dùng Full màn hình
+    Layout = null; 
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Owner - Lịch sử Đặt bàn</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fc;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            align-items: stretch;
+        }
+
+        /* ----- SIDEBAR ----- */
+        .sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background-color: #0e6b53;
+            color: #ffffff;
+            min-height: 100vh;
+            transition: all 0.3s;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-brand {
+            text-align: center;
+            padding: 20px 10px;
+            color: #fff;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand h5 {
+            font-weight: 700; margin: 0; font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        .sidebar-brand span { font-size: 0.8rem; font-weight: normal; display: block; margin-top: 5px; opacity: 0.8; }
+        .sidebar .nav-item { margin-bottom: 5px; }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px; font-weight: 500; display: flex; align-items: center;
+            border-left: 4px solid transparent; text-decoration: none;
+        }
+        .sidebar .nav-link i { margin-right: 15px; font-size: 1.2rem; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #ffffff; background-color: rgba(255, 255, 255, 0.1); border-left: 4px solid #fff;
+        }
+        .logout-item { margin-top: auto; margin-bottom: 20px; }
+
+        /* ----- MAIN CONTENT & HEADER ----- */
+        .main-content {
+            flex-grow: 1; display: flex; flex-direction: column;
+            min-width: 0; height: 100vh; overflow-y: auto;
+        }
+
+        .header {
+            background: #fff; padding: 15px 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #eee; position: relative;
+        }
+
+        #sidebar-toggle {
+            background: none; border: 1px solid #ddd; border-radius: 4px;
+            padding: 5px 10px; font-size: 1.2rem; color: #333; cursor: pointer;
+        }
+
+        .header-title {
+            color: #0e6b53; font-weight: 600; font-size: 1.3rem; margin: 0;
+            position: absolute; left: 50%; transform: translateX(-50%);
+        }
+
+        .user-info { font-weight: 500; color: #333; }
+        
+        #sidebar-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 999; display: none;
+        }
+
+        @@media (max-width: 768px) {
+            .sidebar { position: fixed; margin-left: -250px; }
+            .sidebar.active { margin-left: 0; }
+            .header-title { display: none; }
+        }
+
+        .chip {
+            display: inline-flex; align-items: center; gap: .25rem;
+            padding: .125rem .6rem; border-radius: 999px;
+            background: #f1f3f5; font-size: .825rem; color: #495057;
+            font-weight: 500; border: 1px solid #e9ecef;
+        }
+        
+        .table-sticky thead th {
+            position: sticky; top: 0; z-index: 1; background: #f8f9fa;
+        }
+        
+        .text-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        
+        /* Layout Modal Chi tiết */
+        .kv { display: grid; grid-template-columns: 140px 1fr; gap: .5rem 1rem; }
+        .kv .k { color: #6c757d; font-size: .9rem; }
+        .kv .v { font-weight: 500; color: #212529; }
+        
+        .section-title {
+            font-weight: 700; font-size: .85rem; color: #6c757d;
+            text-transform: uppercase; letter-spacing: .05em;
+            border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px;
+        }
+        
+        .soft-card {
+            border: 1px solid #e9ecef; border-radius: .75rem; background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02); height: 100%;
+        }
+        
+        .dl-2col { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem 1rem; }
+
+        /* PHÂN TRANG */
+        .pagination-custom {
+            display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0;
+        }
+        .page-btn {
+            min-width: 36px; height: 36px; padding: 0 10px;
+            border: 1px solid #dee2e6; border-radius: 6px; background: #fff;
+            color: #6c757d; font-size: 14px; font-weight: 500; text-decoration: none;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; cursor: pointer;
+        }
+        .page-btn:hover:not(.active):not([disabled]) { border-color: #0e6b53; color: #0e6b53; }
+        .page-btn.active { background-color: #0e6b53; color: white; border-color: #0e6b53; font-weight: 600; }
+        .page-btn[disabled] { color: #aaa; background-color: #f8f9fa; cursor: not-allowed; border-color: #eee; }
+
+        /* Custom Button */
+        .btn-primary-custom { background-color: #0e6b53; border-color: #0e6b53; color: #fff; }
+        .btn-primary-custom:hover { background-color: #0b5643; border-color: #0b5643; color: #fff; }
+
+        @@media (max-width: 768px) {
+            .kv { grid-template-columns: 100px 1fr; }
+            .dl-2col { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <h5>🚢 Cát Bà Booking</h5>
+                <span>@SidebarResources.OwnerDashboard</span>
+            </div>
+           
+            <ul class="nav flex-column mt-3 w-100">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="OwnerDashboard" asp-action="OwnerDashboard">
+                        <i class="bi bi-houses-fill text-warning"></i> @SidebarResources.Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="RestaurantProfile" asp-action="RestaurantProfile">
+                        <i class="bi bi-shop text-warning"></i> @SidebarResources.RestaurantInfo
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="RestaurantManageDishes" asp-action="RestaurantManageDishes">
+                        <i class="bi bi-egg-fried text-light"></i> @SidebarResources.ManageDishes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" asp-controller="RestaurantBookings" asp-action="RestaurantBookings">
+                        <i class="bi bi-calendar-check text-light"></i> @SidebarResources.BookingHistory
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="RestaurantManageTables" asp-action="RestaurantManageTables">
+                        <i class="bi bi-grid-3x3 text-light"></i> @SidebarResources.ManageTables
+                    </a>
+                </li>
+                <li class="nav-item logout-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-box-arrow-right text-light"></i> @SidebarResources.Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="sidebar-overlay"></div>
+
+        <div class="main-content">
+            <header class="header">
+                <button id="sidebar-toggle"><i class="bi bi-list"></i></button>
+                <h1 class="header-title">@RestaurantBookingsResources.Title</h1>
+                <div class="user-info">
+                    <i class="bi bi-bell me-3 text-muted"></i>
+                    @Model.RestaurantName
+                </div>
+            </header>
+
+            <main class="content p-4">
+                <div class="container-fluid p-0">
+
+                    @if (TempData["Message"] != null)
+                    {
+                        <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm" role="alert">
+                            <i class="bi bi-info-circle me-2"></i> @TempData["Message"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form class="row g-3 bg-white p-4 rounded-3 shadow-sm border-0 mb-4"
+                          method="get" asp-controller="RestaurantBookings" asp-action="RestaurantBookings">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-muted small uppercase">@RestaurantBookingsResources.SearchByDate</label>
+                            <input type="date" class="form-control" name="reservationDate"
+                                   value="@(Model.ReservationDate?.ToString("yyyy-MM-dd"))" />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold text-muted small uppercase">@RestaurantBookingsResources.SearchByTime</label>
+                            <input type="time" class="form-control" name="reservationTime"
+                                   value="@(Model.ReservationTime?.ToString("HH:mm"))" />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold text-muted small uppercase">@RestaurantBookingsResources.SearchByGuests</label>
+                            <input type="number" class="form-control" name="numGuests" min="1" placeholder="Ví dụ: 4"
+                                   value="@Model.NumGuests" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-muted small uppercase">@RestaurantBookingsResources.Status</label>
+                            <select class="form-select" name="status">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="pending" selected="@(Model.Status == "pending")">Chờ xác nhận</option>
+                                <option value="confirmed" selected="@(Model.Status == "confirmed")">Đã xác nhận</option>
+                                <option value="completed" selected="@(Model.Status == "completed")">Hoàn thành</option>
+                                <option value="cancelled_by_user" selected="@(Model.Status == "cancelled_by_user")">Đã hủy (khách hủy)</option>
+                                <option value="cancelled_by_owner" selected="@(Model.Status == "cancelled_by_owner")">Đã hủy (chủ quán hủy)</option>
+                                <option value="no_show" selected="@(Model.Status == "no_show")">Không đến</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary-custom w-100 py-2">
+                                <i class="bi bi-funnel me-1"></i> @RestaurantBookingsResources.Filter
+                            </button>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.SearchCode))
+                        {
+                            <input type="hidden" name="searchCode" value="@Model.SearchCode" />
+                        }
+                    </form>
+
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center border-bottom-0">
+                            <h5 class="mb-0 fw-bold text-dark">@RestaurantBookingsResources.ListBookings</h5>
+                            
+                            <!-- Form tìm kiếm -->
+                            <form method="get" asp-controller="RestaurantBookings" asp-action="RestaurantBookings"
+                                  class="d-flex gap-2 mt-2 mt-md-0">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                    <input type="search" class="form-control border-start-0 bg-light" name="searchCode"
+                                           placeholder="@RestaurantBookingsResources.SearchByCode" value="@Model.SearchCode" />
+                                </div>
+                                <button type="submit" class="btn btn-dark px-3">@RestaurantBookingsResources.Search</button>
+
+                                <!-- Giữ lại các bộ lọc khác khi tìm theo mã đơn -->
+                                @if (Model.ReservationDate.HasValue)
+                                {
+                                    <input type="hidden" name="reservationDate" value="@Model.ReservationDate.Value.ToString("yyyy-MM-dd")" />
+                                }
+                                @if (Model.ReservationTime.HasValue)
+                                {
+                                    <input type="hidden" name="reservationTime" value="@Model.ReservationTime.Value.ToString("HH:mm")" />
+                                }
+                                @if (Model.NumGuests.HasValue)
+                                {
+                                    <input type="hidden" name="numGuests" value="@Model.NumGuests" />
+                                }
+                                @if (!string.IsNullOrEmpty(Model.Status))
+                                {
+                                    <input type="hidden" name="status" value="@Model.Status" />
+                                }
+                            </form>
+                        </div>
+
+                        <div class="card-body p-0">
+                            <div class="table-responsive table-sticky" style="max-height: 60vh;">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="ps-4 py-3">Mã Đơn</th>
+                                            <th class="py-3">Khách đặt</th>
+                                            <th class="py-3">Liên hệ</th>
+                                            <th class="py-3">Bàn</th>
+                                            <th class="py-3">Ngày & Giờ</th>
+                                            <th class="py-3 text-center">Khách</th>
+                                            <th class="py-3">Tổng tiền</th>
+                                            <th class="py-3">Trạng thái</th>
+                                            <th class="text-end pe-4 py-3">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (!Model.Bookings.Any())
+                                        {
+                                            <tr><td colspan="9" class="text-center text-muted py-4">@RestaurantBookingsResources.NoBookings</td></tr>
+                                        }
+                                        else
+                                        {
+                                            foreach (var booking in Model.Bookings)
+                                            {
+                                                <tr>
+                                                    <td class="ps-4"><span class="text-mono fw-bold text-primary">#@booking.BookingCode</span></td>
+                                                    <td>
+                                                        <div class="fw-bold text-dark">@booking.BookerName</div>
+                                                        <div class="small text-muted">@booking.BookerEmail</div>
+                                                    </td>
+                                                    <td><span class="chip"><i class="bi bi-telephone-fill text-muted" style="font-size:0.7rem"></i> @booking.BookerPhone</span></td>
+                                                    <td><span class="badge text-bg-light border text-dark">@booking.TableNames</span></td>
+                                                    <td>
+                                                        <div class="fw-bold text-dark">@(booking.ReservationDate?.ToString("dd/MM/yyyy"))</div>
+                                                        <div class="text-muted small"><i class="bi bi-clock"></i> @(booking.ReservationTime?.ToString("HH:mm"))</div>
+                                                    </td>
+                                                    <td class="text-center fw-semibold">@booking.NumGuests</td>
+                                                    <td class="fw-bold text-danger">@booking.TotalPrice.ToString("N0") ₫</td>
+                                                    <td><span class="badge @booking.StatusBadgeClass px-2 py-1">@booking.StatusLabel</span></td>
+                                                    <td class="text-end pe-4">
+                                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#detail-@booking.BookingId">
+                                                            @RestaurantBookingsResources.Details
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white py-3 border-top d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                            <div class="small text-muted fw-medium">
+                               @RestaurantBookingsResources.Total: <strong class="text-dark">@Model.TotalCount</strong> booking | @RestaurantBookingsResources.Page <strong class="text-dark">@Model.CurrentPage/@Model.TotalPages</strong>
+                            </div>
+
+                            <div class="pagination-custom">
+                                @{
+                                    var prevPage = Model.CurrentPage - 1;
+                                    var nextPage = Model.CurrentPage + 1;
+                                    var windowStart = Math.Max(1, Model.CurrentPage - 2);
+                                    var windowEnd = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+                                }
+                                @if (Model.CurrentPage <= 1)
+                                {
+                                    <span class="page-btn" disabled>Trước</span>
+                                }
+                                else
+                                {
+                                    <a class="page-btn" asp-controller="RestaurantBookings" asp-action="RestaurantBookings"
+                                       asp-route-page="@prevPage" asp-route-reservationDate="@Model.ReservationDate" asp-route-reservationTime="@Model.ReservationTime"
+                                       asp-route-numGuests="@Model.NumGuests" asp-route-status="@Model.Status" asp-route-searchCode="@Model.SearchCode">Trước</a>
+                                }
+
+                                @if (windowStart > 1)
+                                {
+                                    <a class="page-btn" asp-controller="RestaurantBookings" asp-action="RestaurantBookings"
+                                       asp-route-page="1" asp-route-reservationDate="@Model.ReservationDate" asp-route-reservationTime="@Model.ReservationTime"
+                                       asp-route-numGuests="@Model.NumGuests" asp-route-status="@Model.Status" asp-route-searchCode="@Model.SearchCode">1</a>
+                                    <span class="text-muted mx-1">...</span>
+                                }
+
+                                @for (var p = windowStart; p <= windowEnd; p++)
+                                {
+                                    if (p == Model.CurrentPage)
+                                    {
+                                        <span class="page-btn active">@p</span>
+                                    }
+                                    else
+                                    {
+                                        <a class="page-btn" asp-controller="RestaurantBookings" asp-action="RestaurantBookings"
+                                           asp-route-page="@p" asp-route-reservationDate="@Model.ReservationDate" asp-route-reservationTime="@Model.ReservationTime"
+                                           asp-route-numGuests="@Model.NumGuests" asp-route-status="@Model.Status" asp-route-searchCode="@Model.SearchCode">@p</a>
+                                    }
+                                }
+
+                                @if (windowEnd < Model.TotalPages)
+                                {
+                                    <span class="text-muted mx-1">...</span>
+                                    <a class="page-btn" asp-controller="RestaurantBookings" asp-action="RestaurantBookings"
+                                       asp-route-page="@Model.TotalPages" asp-route-reservationDate="@Model.ReservationDate" asp-route-reservationTime="@Model.ReservationTime"
+                                       asp-route-numGuests="@Model.NumGuests" asp-route-status="@Model.Status" asp-route-searchCode="@Model.SearchCode">@Model.TotalPages</a>
+                                }
+
+                                @if (Model.CurrentPage >= Model.TotalPages)
+                                {
+                                    <span class="page-btn" disabled>Sau</span>
+                                }
+                                else
+                                {
+                                    <a class="page-btn" asp-controller="RestaurantBookings" asp-action="RestaurantBookings"
+                                       asp-route-page="@nextPage" asp-route-reservationDate="@Model.ReservationDate" asp-route-reservationTime="@Model.ReservationTime"
+                                       asp-route-numGuests="@Model.NumGuests" asp-route-status="@Model.Status" asp-route-searchCode="@Model.SearchCode">Sau</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    @foreach (var booking in Model.Bookings)
+    {
+        <div class="modal fade" id="detail-@booking.BookingId" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-light border-bottom-0 pb-3">
+                        <div class="w-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h5 class="modal-title fw-bold">
+                                    @RestaurantBookingsResources.BookingDetail <span class="text-mono text-primary">#@booking.BookingCode</span>
+                                    <span class="badge ms-2 px-2 py-1 @booking.StatusBadgeClass" style="font-size: 0.8rem; vertical-align: middle;">@booking.StatusLabel</span>
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="text-muted small mt-1">
+                                @RestaurantBookingsResources.CreatedAt @(booking.CreatedAt?.ToString("dd/MM/yyyy HH:mm")) • @RestaurantBookingsResources.CreatedAt @(booking.UpdatedAt?.ToString("dd/MM/yyyy HH:mm"))
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-body p-4 pt-3 bg-light bg-opacity-50">
+                        <div class="row g-4">
+                            <!-- Cột Trái: Thông tin tổng quan & Thanh toán -->
+                            <div class="col-lg-5 d-flex flex-column gap-4">
+                                <div class="soft-card p-4">
+                                    <div class="section-title"><i class="bi bi-info-square me-2"></i>@RestaurantBookingsResources.Overview</div>
+                                    <div class="kv mt-3">
+                                        <div class="k">@RestaurantBookingsResources.Status</div>
+                                        <div class="v"><span class="badge @booking.StatusBadgeClass">@booking.StatusLabel</span></div>
+
+                                        <div class="k">@RestaurantBookingsResources.SearchByGuests</div>
+                                        <div class="v">@booking.NumGuests @RestaurantBookingsResources.People</div>
+
+                                        <div class="k">@RestaurantBookingsResources.ReservedTable</div>
+                                        <div class="v"><span class="badge text-bg-light border text-dark">@booking.TableNames</span></div>
+
+                                        <div class="k">@RestaurantBookingsResources.ArrivalDateTime</div>
+                                        <div class="v fw-bold text-primary">@(booking.ReservationDate?.ToString("dd/MM/yyyy")) - @(booking.ReservationTime?.ToString("HH:mm"))</div>
+                                    </div>
+                                </div>
+
+                                <div class="soft-card p-4">
+                                    <div class="section-title"><i class="bi bi-credit-card me-2"></i>@RestaurantBookingsResources.Payment</div>
+                                    <div class="dl-2col mt-3 align-items-center">
+                                        <div class="text-muted small">@RestaurantBookingsResources.TotalAmount</div>
+                                        <div class="fw-bold text-danger fs-5">@booking.TotalPrice.ToString("N0") ₫</div>
+
+                                        <div class="text-muted small">@RestaurantBookingsResources.PaymentStatus</div>
+                                        <div>
+                                            <span class="badge bg-secondary">
+                                                @booking.PaymentStatusLabel@(string.IsNullOrEmpty(booking.PaymentMethod) ? "" : $" ({booking.PaymentMethod})")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cột Phải: Khách hàng & Món ăn -->
+                            <div class="col-lg-7 d-flex flex-column gap-4">
+                                <div class="soft-card p-4">
+                                    <div class="section-title"><i class="bi bi-person-badge me-2"></i>@RestaurantBookingsResources.CustomerInfo</div>
+                                    <div class="kv mt-3">
+                                        <div class="k">@RestaurantBookingsResources.BookedName</div><div class="v fw-bold">@booking.BookerName</div>
+                                        <div class="k">@RestaurantBookingsResources.Email</div><div class="v">@booking.BookerEmail</div>
+                                        <div class="k">@RestaurantBookingsResources.NumPhone</div>
+                                        <div class="v">
+                                            <span class="chip bg-white shadow-sm"><i class="bi bi-telephone-fill text-primary" style="font-size:0.7rem"></i> @booking.BookerPhone</span>
+                                        </div>
+                                        @if (!string.IsNullOrWhiteSpace(booking.Notes))
+                                        {
+                                            <div class="k">@RestaurantBookingsResources.Notes</div>
+                                            <div class="v text-muted fst-italic">"@booking.Notes"</div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="soft-card p-0 overflow-hidden d-flex flex-column h-100">
+                                    @if (booking.Dishes.Any())
+                                    {
+                                        <div class="p-4 pb-2 border-bottom">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="section-title mb-0 border-0 pb-0"><i class="bi bi-egg-fried me-2"></i>@RestaurantBookingsResources.PreorderedDishes</div>
+                                                <div class="small text-muted bg-light px-2 py-1 rounded">@RestaurantBookingsResources.BookingPrice</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="table-responsive flex-grow-1">
+                                            <table class="table table-hover align-middle mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th class="ps-4">@RestaurantBookingsResources.DishName</th>
+                                                        <th class="text-center" style="width: 70px;">SL</th>
+                                                        <th class="text-end" style="width: 130px;">Đơn giá</th>
+                                                        <th style="width: 150px;">Ghi chú món</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var dish in booking.Dishes)
+                                                    {
+                                                        <tr>
+                                                            <td class="ps-4 fw-medium">@dish.DishName</td>
+                                                            <td class="text-center fw-bold">@dish.Quantity</td>
+                                                            <td class="text-end">@dish.PriceAtBooking.ToString("N0") ₫</td>
+                                                            <td class="small text-muted">@(string.IsNullOrWhiteSpace(dish.Notes) ? "-" : dish.Notes)</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                                <tfoot class="table-light border-top">
+                                                    <tr>
+                                                        <th colspan="2" class="ps-4 py-3">Tổng cộng các món</th>
+                                                        <th class="text-end py-3 fw-bold text-danger fs-6">@booking.Dishes.Sum(d => d.Quantity * d.PriceAtBooking).ToString("N0") ₫</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="p-4 h-100 d-flex flex-column justify-content-center align-items-center text-center bg-white">
+                                            <div class="p-3 bg-light rounded-circle mb-3">
+                                                <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
+                                            </div>
+                                            <h6 class="fw-bold text-dark">@RestaurantBookingsResources.NoPreorderedDishes</h6>
+                                            <p class="text-muted small mb-0">@RestaurantBookingsResources.NoPreorderedDishes2</p>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light border-top-0">
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">@RestaurantBookingsResources.Close</button>
+                        <button type="button" class="btn btn-primary-custom px-4" onclick="window.print()"><i class="bi bi-printer me-2"></i>@RestaurantBookingsResources.PrintInvoice</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('sidebar-toggle');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if(toggle) {
+                toggle.addEventListener('click', () => { 
+                    sidebar.classList.add('active'); 
+                    overlay.style.display = 'block'; 
+                });
+            }
+            if(overlay) {
+                overlay.addEventListener('click', () => { 
+                    sidebar.classList.remove('active'); 
+                    overlay.style.display = 'none'; 
+                });
+            }
+        });
+    </script>
+</body>
+</html>
