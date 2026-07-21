@@ -94,6 +94,7 @@ Layout = null;
                             <div class="rating">
                                 <div class="stars">
                                     @{
+                                        int maxStars = ViewBag.MaxStarRating;
                                         int fullStars = (int)Math.Floor(homestay.AverageRating);
                                         bool hasHalf = (homestay.AverageRating - fullStars) >= 0.5;
                                     }
@@ -105,7 +106,7 @@ Layout = null;
                                     {
                                         <i class="fas fa-star-half-alt"></i>
                                     }
-                                    @for (int i = fullStars + (hasHalf ? 1 : 0); i < 5; i++)
+                                    @for (int i = fullStars + (hasHalf ? 1 : 0); i < maxStars; i++)
                                     {
                                         <i class="far fa-star"></i>
                                     }
@@ -198,6 +199,7 @@ Layout = null;
                                 <div class="rating">
                                     <div class="stars">                                 
                                         @{
+                                            int maxStars = ViewBag.MaxStarRating ?? 5;
                                             int rFullStars = (int)Math.Floor(restaurant.AverageRating);
                                             bool rHasHalf = (restaurant.AverageRating - rFullStars) >= 0.5;
                                         }
@@ -212,7 +214,7 @@ Layout = null;
                                             <i class="fas fa-star-half-alt"></i>
                                         }
                                         
-                                        @for (int i = rFullStars + (rHasHalf ? 1 : 0); i < 5; i++)
+                                        @for (int i = rFullStars + (rHasHalf ? 1 : 0); i < maxStars; i++)
                                         {
                                             <i class="far fa-star"></i>
                                         }

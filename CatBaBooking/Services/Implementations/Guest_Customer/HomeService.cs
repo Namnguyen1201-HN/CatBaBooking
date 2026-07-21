@@ -2,21 +2,25 @@ using CatBaBooking.Repository.Interface;
 using CatBaBooking.Services.Interfaces.Guest_Customer;
 using CatBaBooking.ViewModels.Homestay;
 using CatBaBooking.ViewModels.Restaurant;
+using Microsoft.Extensions.Configuration;
 
 namespace CatBaBooking.Services.Implementations.Guest_Customer;
 
 public class HomeService : IHomeService 
 {
     private readonly IBusinessRepository _businessRepo;
+    private readonly IConfiguration _configuration;
 
-    public HomeService(IBusinessRepository businessRepo)
+    public HomeService(IBusinessRepository businessRepo, IConfiguration configuration)
     {
         _businessRepo = businessRepo;
+        _configuration = configuration;
     }
 
     public List<HomestayCardViewModel> GetFeaturedHomestays()
     {
-        var homestays = _businessRepo.GetFeaturedHomestays(3);
+        int count = _configuration.GetValue<int>("AppSettings:FeaturedHomestaysCount");
+        var homestays = _businessRepo.GetFeaturedHomestays(count);
         
         // Map to ViewModel
         return homestays.Select(h => new HomestayCardViewModel
@@ -34,7 +38,8 @@ public class HomeService : IHomeService
 
     public List<RestaurantCardViewModel> GetFeaturedRestaurants()
     {       
-        var restaurants = _businessRepo.GetFeaturedRestaurants(3);
+        int count = _configuration.GetValue<int>("AppSettings:FeaturedRestaurantsCount");
+        var restaurants = _businessRepo.GetFeaturedRestaurants(count);
         
         return restaurants.Select(r => new RestaurantCardViewModel
         {

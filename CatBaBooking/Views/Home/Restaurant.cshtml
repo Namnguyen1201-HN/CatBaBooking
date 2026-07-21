@@ -49,11 +49,10 @@
                         <h4>Khu vực</h4>
                         <div class="filter-options">
                             <label class="filter-option"><input type="radio" name="areaId" value="0" @(Model.AreaId == null || Model.AreaId == 0 ? "checked" : "")><span>Tất cả khu vực</span></label>
-                            <label class="filter-option"><input type="radio" name="areaId" value="1" @(Model.AreaId == 1 ? "checked" : "")><span>TT.Cát Bà</span></label>
-                            <label class="filter-option"><input type="radio" name="areaId" value="2" @(Model.AreaId == 2 ? "checked" : "")><span>Trung tâm Cát Bà</span></label>
-                            <label class="filter-option"><input type="radio" name="areaId" value="3" @(Model.AreaId == 3 ? "checked" : "")><span>Vườn quốc gia Cát Bà</span></label>
-                            <label class="filter-option"><input type="radio" name="areaId" value="4" @(Model.AreaId == 4 ? "checked" : "")><span>Làng Việt Hải</span></label>
-                            <label class="filter-option"><input type="radio" name="areaId" value="5" @(Model.AreaId == 5 ? "checked" : "")><span>Bến Bèo</span></label>
+                            @foreach (var area in Model.AvailableAreas)
+                            {
+                                <label class="filter-option"><input type="radio" name="areaId" value="@area.Key" @(Model.AreaId == area.Key ? "checked" : "")><span>@area.Value</span></label>
+                            }
                         </div>
                     </div>
 
@@ -61,10 +60,10 @@
                         <h4>Loại hình</h4>
                         <div class="filter-options">
                             <label class="filter-option"><input type="radio" name="restaurantType" value="" @(string.IsNullOrEmpty(Model.RestaurantType) ? "checked" : "")><span>Tất cả</span></label>
-                            <label class="filter-option"><input type="radio" name="restaurantType" value="1" @(Model.RestaurantType == "1" ? "checked" : "")><span>Nhà hàng hải sản</span></label>
-                            <label class="filter-option"><input type="radio" name="restaurantType" value="2" @(Model.RestaurantType == "2" ? "checked" : "")><span>Quán ăn địa phương</span></label>
-                            <label class="filter-option"><input type="radio" name="restaurantType" value="3" @(Model.RestaurantType == "3" ? "checked" : "")><span>Nướng BBQ</span></label>
-                            <label class="filter-option"><input type="radio" name="restaurantType" value="4" @(Model.RestaurantType == "4" ? "checked" : "")><span>Lẩu</span></label>
+                            @foreach (var rt in Model.AvailableRestaurantTypes)
+                            {
+                                <label class="filter-option"><input type="radio" name="restaurantType" value="@rt.Key" @(Model.RestaurantType == rt.Key ? "checked" : "")><span>@rt.Value</span></label>
+                            }
                         </div>
                     </div>
 
@@ -113,7 +112,10 @@
                                         <div class="rating-price">
                                             <div class="rating">
                                                 <div class="stars">
-                                                    @for (int i = 1; i <= 5; i++)
+                                                    @{
+                                                        int maxStars = ViewBag.MaxStarRating ?? 5;
+                                                    }
+                                                    @for (int i = 1; i <= maxStars; i++)
                                                     {
                                                         if (i <= Math.Floor(restaurant.AverageRating))
                                                         {

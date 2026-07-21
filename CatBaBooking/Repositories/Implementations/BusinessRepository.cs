@@ -50,7 +50,8 @@ public class BusinessRepository : IBusinessRepository
                                         int? areaId = null,                                                                         
                                         string? priceRange = null, 
                                         List<int>? minRating = null, 
-                                        List<int>? amenityIds = null, string? sortOrder = null) 
+                                        List<int>? amenityIds = null, 
+                                        string? sortOrder = null) 
     {
         var query = _context.Businesses
             .Include(b => b.Area)
@@ -69,7 +70,7 @@ public class BusinessRepository : IBusinessRepository
             var parts = priceRange.Split('-');
             if (parts.Length == 2 && decimal.TryParse(parts[0], out decimal minPrice) && decimal.TryParse(parts[1], out decimal maxPrice))
             {
-                if (maxPrice == 0) // e.g. "1000000-0" for 1,000,000+
+                if (maxPrice == 0)
                 {
                     query = query.Where(b => (b.Rooms.Any() ? b.Rooms.Min(r => r.PricePerNight) : b.PricePerNight) >= minPrice);
                 }
@@ -138,7 +139,6 @@ public class BusinessRepository : IBusinessRepository
 
         if (!string.IsNullOrEmpty(restaurantType))
         {
-            // Assuming restaurantType from UI is an ID like "1", "2", "3"
             if (int.TryParse(restaurantType, out int typeId))
             {
                 query = query.Where(b => b.Types.Any(t => t.TypeId == typeId));
@@ -157,7 +157,7 @@ public class BusinessRepository : IBusinessRepository
         {
             query = query.OrderByDescending(b => b.AvgRating);
         }
-        else // Phù hợp nhất -> theo số lượng review
+        else 
         {
             query = query.OrderByDescending(b => b.ReviewCount).ThenByDescending(b => b.AvgRating);
         }
@@ -192,4 +192,18 @@ public class BusinessRepository : IBusinessRepository
             .FirstOrDefault(b => b.BusinessId == businessId && b.Type == "Restaurant");
     }
 
+    public List<Area> GetAllAreas()
+    {
+        return _context.Areas.ToList();
+    }
+
+    public List<Amenity> GetAllAmenities()
+    {
+        return _context.Amenities.ToList();
+    }
+
+    public List<RestaurantType> GetAllRestaurantTypes()
+    {
+        return _context.RestaurantTypes.ToList();
+    }
 }

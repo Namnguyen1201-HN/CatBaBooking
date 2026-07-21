@@ -60,7 +60,10 @@ Layout = null;
                         <div class="rating-score">@Model.AverageRating.ToString("0.0")</div> 
                         <div class="rating-details">
                             <div class="stars">
-                                @for (int i = 1; i <= 5; i++)
+                                @{
+                                    int maxStars = ViewBag.MaxStarRating ?? 5;
+                                }
+                                @for (int i = 1; i <= maxStars; i++)
                                 {
                                     if (i <= Math.Floor(Model.AverageRating))
                                     {
@@ -168,8 +171,11 @@ Layout = null;
         <div class="right-col">
             <div class="section-card map-card" id="map">
                 <div class="section-title"><i class="fa-solid fa-map-location-dot"></i> <span>Vị trí trên bản đồ</span></div>
-                <iframe src="https://maps.google.com/maps?q=Cat+Ba+Island&t=&z=15&ie=UTF8&iwloc=&output=embed" loading="lazy" style="width:100%;height:250px;border:none;border-radius:8px;"></iframe>
-                <p style="font-size:.8rem;color:#6b7280;margin-top:.5rem;">Gần trung tâm Cát Bà • Thuận tiện thuê xe máy</p>
+                @{
+                    var addressQuery = Uri.EscapeDataString($"{Model.Name}, {Model.Address}, {Model.AreaName}, Cát Bà, Hải Phòng");
+                }
+                <iframe src="https://maps.google.com/maps?q=@addressQuery&t=&z=15&ie=UTF8&iwloc=&output=embed" loading="lazy" style="width:100%;height:250px;border:none;border-radius:8px;"></iframe>
+                <p style="font-size:.8rem;color:#6b7280;margin-top:.5rem;">@(Model.Address)</p>
             </div>
             <div class="section-card host-card">
                 <div class="section-title"><i class="fa-solid fa-user-tie"></i> <span>Chủ nhà</span></div>

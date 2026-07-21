@@ -28,4 +28,9 @@ public class HomestayListViewModel
     public List<int>? MinRating { get; set; } = new List<int>();
     public List<int>? AmenityIds { get; set; } = new List<int>();
     public string? SortOrder { get; set; }
+
+    // Dynamic Filter Data
+    public Dictionary<int, string> AvailableAreas { get; set; } = new Dictionary<int, string>();
+    public Dictionary<int, string> AvailableAmenities { get; set; } = new Dictionary<int, string>();
+    public Dictionary<string, string> AvailablePriceRanges { get; set; } = new Dictionary<string, string>();
 }

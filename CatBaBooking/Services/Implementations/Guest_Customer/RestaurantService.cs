@@ -39,6 +39,9 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
                 OpeningTime = r.OpeningHour?.ToString("HH:mm"),
                 ClosingTime = r.ClosingHour?.ToString("HH:mm")
             }).ToList();
+            var areas = _businessRepo.GetAllAreas().ToDictionary(a => a.AreaId, a => a.Name);
+            var types = _businessRepo.GetAllRestaurantTypes().ToDictionary(t => t.TypeId.ToString(), t => t.Name);
+
             return new RestaurantListViewModel
             {
                 Items = items,
@@ -48,7 +51,9 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
                 AreaId = areaId,
                 RestaurantType = restaurantType,
                 MinRating = minRating ?? new List<int>(),
-                SortOrder = sortOrder
+                SortOrder = sortOrder,
+                AvailableAreas = areas,
+                AvailableRestaurantTypes = types
             };
         }
 

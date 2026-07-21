@@ -26,4 +26,8 @@ public interface IBusinessRepository
 
     Business GetHomestayDetail(int businessId);
     Business GetRestaurantDetail(int businessId);
+
+    List<Area> GetAllAreas();
+    List<Amenity> GetAllAmenities();
+    List<RestaurantType> GetAllRestaurantTypes();
 }
