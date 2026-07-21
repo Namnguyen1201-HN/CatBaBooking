@@ -56,11 +56,10 @@
                             <h4>Khu vực</h4>
                             <div class="filter-options">
                                 <label class="filter-option"><input type="radio" name="areaId" value="0" @(Model.AreaId == null || Model.AreaId == 0 ? "checked" : "")><span>Tất cả khu vực</span></label>
-                                <label class="filter-option"><input type="radio" name="areaId" value="1" @(Model.AreaId == 1 ? "checked" : "")><span>TT.Cát Bà</span></label>
-                                <label class="filter-option"><input type="radio" name="areaId" value="2" @(Model.AreaId == 2 ? "checked" : "")><span>Trung tâm Cát Bà</span></label>
-                                <label class="filter-option"><input type="radio" name="areaId" value="3" @(Model.AreaId == 3 ? "checked" : "")><span>Vườn quốc gia Cát Bà</span></label>
-                                <label class="filter-option"><input type="radio" name="areaId" value="4" @(Model.AreaId == 4 ? "checked" : "")><span>Làng Việt Hải</span></label>
-                                <label class="filter-option"><input type="radio" name="areaId" value="5" @(Model.AreaId == 5 ? "checked" : "")><span>Bến Bèo</span></label>
+                                @foreach (var area in Model.AvailableAreas)
+                                {
+                                    <label class="filter-option"><input type="radio" name="areaId" value="@area.Key" @(Model.AreaId == area.Key ? "checked" : "")><span>@area.Value</span></label>
+                                }
                             </div>
                         </div>
 
@@ -68,10 +67,10 @@
                             <h4>Khoảng giá (VND)</h4>
                             <div class="filter-options">
                                 <label class="filter-option"><input type="radio" name="priceRange" value="" @(string.IsNullOrEmpty(Model.PriceRange) ? "checked" : "")><span>Tất cả</span></label>
-                                <label class="filter-option"><input type="radio" name="priceRange" value="0-200000" @(Model.PriceRange == "0-200000" ? "checked" : "")><span>Dưới 200.000</span></label>
-                                <label class="filter-option"><input type="radio" name="priceRange" value="200000-500000" @(Model.PriceRange == "200000-500000" ? "checked" : "")><span>200.000 - 500.000</span></label>
-                                <label class="filter-option"><input type="radio" name="priceRange" value="500000-1000000" @(Model.PriceRange == "500000-1000000" ? "checked" : "")><span>500.000 - 1.000.000</span></label>
-                                <label class="filter-option"><input type="radio" name="priceRange" value="1000000-0" @(Model.PriceRange == "1000000-0" ? "checked" : "")><span>Trên 1.000.000</span></label>
+                                @foreach (var pr in Model.AvailablePriceRanges)
+                                {
+                                    <label class="filter-option"><input type="radio" name="priceRange" value="@pr.Key" @(Model.PriceRange == pr.Key ? "checked" : "")><span>@pr.Value</span></label>
+                                }
                             </div>
                         </div>
                         <div class="filter-group">
@@ -85,10 +84,10 @@
                         <div class="filter-group">
                             <h4>Tiện ích</h4>
                             <div class="filter-options">
-                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="1" @(Model.AmenityIds != null && Model.AmenityIds.Contains(1) ? "checked" : "")><span>WiFi miễn phí</span></label>
-                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="2" @(Model.AmenityIds != null && Model.AmenityIds.Contains(2) ? "checked" : "")><span>Bữa sáng</span></label>
-                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="3" @(Model.AmenityIds != null && Model.AmenityIds.Contains(3) ? "checked" : "")><span>Bãi đỗ xe</span></label>
-                                <label class="filter-option"><input type="checkbox" name="amenityIds" value="4" @(Model.AmenityIds != null && Model.AmenityIds.Contains(4) ? "checked" : "")><span>Hồ bơi</span></label>
+                                @foreach (var amenity in Model.AvailableAmenities)
+                                {
+                                    <label class="filter-option"><input type="checkbox" name="amenityIds" value="@amenity.Key" @(Model.AmenityIds != null && Model.AmenityIds.Contains(amenity.Key) ? "checked" : "")><span>@amenity.Value</span></label>
+                                }
                             </div>
                         </div>
                         <div style="display: flex; gap: 10px;">
@@ -137,7 +136,10 @@
                                     <div class="rating-price">
                                         <div class="rating">
                                             <div class="stars">
-                                                @for (int i = 1; i <= 5; i++)
+                                                @{
+                                                    int maxStars = ViewBag.MaxStarRating ?? 5;
+                                                }
+                                                @for (int i = 1; i <= maxStars; i++)
                                                 {
                                                     if (i <= Math.Floor(homestay.AverageRating))
                                                     {

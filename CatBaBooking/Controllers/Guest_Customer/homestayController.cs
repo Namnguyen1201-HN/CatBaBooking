@@ -1,30 +1,30 @@
 using CatBaBooking.Services.Interfaces.Guest_Customer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace CatBaBooking.Controllers.Guest_Customer
 {
-    public class homestayController : Controller //NamNS
+    public class homestayController : Controller 
     {
         private readonly IHomestayService _homestayService;
+        private readonly IConfiguration _configuration;
 
-        public homestayController(IHomestayService homestayService)
+        public homestayController(IHomestayService homestayService, IConfiguration configuration)
         {
             _homestayService = homestayService;
+            _configuration = configuration;
         }
 
         [Route("homestay-page")]
         public IActionResult Index(int page = 1, 
-                                int? areaId = null, 
-                                DateTime? checkIn = null, 
-                                DateTime? checkOut = null, 
-                                int? guests = null, 
-                                int? numRooms = null, 
+                                int? areaId = null,  
                                 string? priceRange = null, 
                                 [FromQuery] List<int>? minRating = null, 
                                 [FromQuery] List<int>? amenityIds = null, 
                                 string? sortOrder = null)
         {
             var viewModel = _homestayService.GetHomestays(page, areaId, priceRange, minRating, amenityIds, sortOrder);       
+            ViewBag.MaxStarRating = _configuration.GetValue<int>("AppSettings:MaxStarRating");
             return View("~/Views/Home/Homestay.cshtml", viewModel);
         }
 
@@ -37,6 +37,7 @@ namespace CatBaBooking.Controllers.Guest_Customer
             {
                 return NotFound();
             }
+            ViewBag.MaxStarRating = _configuration.GetValue<int>("AppSettings:MaxStarRating", 5);
             return View("~/Views/Home/HomestayDetail.cshtml", viewModel);
         }
 

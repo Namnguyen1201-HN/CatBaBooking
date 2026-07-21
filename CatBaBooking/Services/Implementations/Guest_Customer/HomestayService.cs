@@ -3,6 +3,7 @@ using CatBaBooking.Services.Interfaces.Guest_Customer;
 using CatBaBooking.ViewModels.Homestay;
 using CatBaBooking.Repositories.Interfaces;
 using CatBaBooking.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace CatBaBooking.Services.Implementations.Guest_Customer
 {
@@ -10,12 +11,14 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
     {
         private readonly IBusinessRepository _businessRepo;
         private readonly IBookingRepository _bookingRepo;
+        private readonly IConfiguration _configuration;
         private const int PageSize = 6; 
 
-        public HomestayService(IBusinessRepository businessRepo, IBookingRepository bookingRepo)
+        public HomestayService(IBusinessRepository businessRepo, IBookingRepository bookingRepo, IConfiguration configuration)
         {
             _businessRepo = businessRepo;
             _bookingRepo = bookingRepo;
+            _configuration = configuration;
         }
 
         public HomestayListViewModel GetHomestays(int page, 
@@ -45,6 +48,10 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
                 PriceFrom = h.Rooms.Any() ? h.Rooms.Min(r => r.PricePerNight) : (h.PricePerNight ?? 0)
             }).ToList();
 
+            var areas = _businessRepo.GetAllAreas().ToDictionary(a => a.AreaId, a => a.Name);
+            var amenities = _businessRepo.GetAllAmenities().ToDictionary(a => a.AmenityId, a => a.Name);
+            var priceRanges = _configuration.GetSection("AppSettings:PriceRanges").Get<Dictionary<string, string>>() ?? new Dictionary<string, string>();
+
             return new HomestayListViewModel
             {
                 Items = items,
@@ -55,7 +62,10 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
                 PriceRange = priceRange,
                 MinRating = minRating ?? new List<int>(),
                 AmenityIds = amenityIds ?? new List<int>(),
-                SortOrder = sortOrder
+                SortOrder = sortOrder,
+                AvailableAreas = areas,
+                AvailableAmenities = amenities,
+                AvailablePriceRanges = priceRanges
             };
         }
 
@@ -64,7 +74,6 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
             var homestay = _businessRepo.GetHomestayDetail(businessId);
             if (homestay == null) return null;
 
-            // Map danh sách phòng
             var rooms = homestay.Rooms.Select(r => new RoomSummaryViewModel
             {
                 RoomId = r.RoomId,
@@ -74,7 +83,6 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
                 IsAvailable = r.IsActive ?? true
             }).ToList();
 
-            // Map danh sách đánh giá
             var reviews = homestay.Reviews.Select(r => new ReviewSummaryViewModel
             {
                 UserName = r.User?.FullName ?? "Khách ẩn danh",
@@ -83,7 +91,6 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
                 CreatedAt = r.CreatedAt ?? DateTime.Now
             }).ToList();
 
-            // Map danh sách tiện nghi
             var amenities = homestay.Amenities.Select(a => a.Name).ToList();
             return new HomestayDetailViewModel
             {
@@ -136,8 +143,8 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
                 NumGuests = model.NumGuests,
                 TotalPrice = model.TotalAmount,
                 Notes = model.Notes,
-                ReservationDate = model.CheckIn, // Store CheckIn as ReservationDate
-                ReservationEndTime = model.CheckOut.ToDateTime(TimeOnly.MinValue), // Or another appropriate field
+                ReservationDate = model.CheckIn, 
+                ReservationEndTime = model.CheckOut.ToDateTime(TimeOnly.MinValue), 
                 Status = "Pending",
                 CreatedAt = DateTime.Now
             };
@@ -150,7 +157,7 @@ namespace CatBaBooking.Services.Implementations.Guest_Customer
 
             booking.BookedRooms.Add(bookedRoom);
 
-            var createdBooking = _bookingRepo.CreateBooking(booking, null); // null for bookingDishes
+            var createdBooking = _bookingRepo.CreateBooking(booking, null); 
             return createdBooking?.BookingCode;
         }
 
