@@ -13,8 +13,6 @@ public class BusinessRepository : IBusinessRepository
         _context = context;
     }
 
-    // NAMNS da o day
-
     public bool AnyBusinessByOwnerId(int ownerId)
     {
         return _context.Businesses.Any(x => x.OwnerId == ownerId);
@@ -25,6 +23,17 @@ public class BusinessRepository : IBusinessRepository
         _context.Businesses.Add(business);
         _context.SaveChanges();
         return true;
+    }
+
+    public Business? GetByOwnerId(int ownerId)
+    {
+        return _context.Businesses.FirstOrDefault(b => b.OwnerId == ownerId);
+    }
+
+    public void Update(Business business)
+    {
+        _context.Businesses.Update(business);
+        _context.SaveChanges();
     }
 
     public List<Business> GetFeaturedHomestays(int count) 

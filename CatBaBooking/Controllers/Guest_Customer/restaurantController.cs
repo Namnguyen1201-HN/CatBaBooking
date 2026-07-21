@@ -29,6 +29,7 @@ namespace CatBaBooking.Controllers.Guest_Customer
             var viewModel = _restaurantService.GetRestaurantDetail(id);
 
             if (viewModel == null) return NotFound();
+            ViewBag.MaxStarRating = _configuration.GetValue<int>("AppSettings:MaxStarRating", 5);
             return View("~/Views/Home/RestaurantDetail.cshtml", viewModel);
         }
 

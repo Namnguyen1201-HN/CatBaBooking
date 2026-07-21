@@ -46,7 +46,10 @@
                                 <div class="rating-line">
                                     <span class="score">@Model.AverageRating.ToString("0.0") /5</span>
                                     <div class="stars">
-                                        @for (int i = 1; i <= 5; i++)
+                                        @{
+                                            int maxStars = ViewBag.MaxStarRating ?? 5;
+                                        }
+                                        @for (int i = 1; i <= maxStars; i++)
                                         {
                                             if (i <= Math.Floor(Model.AverageRating))
                                             {
@@ -143,7 +146,10 @@
                                 <div style="display:flex;align-items:center;margin-bottom:8px;">
                                     <div style="font-weight:600;color:#333;margin-right:12px;">@review.UserName</div>
                                     <div style="color:#ffc107;">
-                                        @for (int i = 1; i <= 5; i++)
+                                        @{
+                                            int maxStarsReview = ViewBag.MaxStarRating ?? 5;
+                                        }
+                                        @for (int i = 1; i <= maxStarsReview; i++)
                                         {
                                             if (i <= review.Rating)
                                             {
